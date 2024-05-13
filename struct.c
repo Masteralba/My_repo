@@ -1,4 +1,5 @@
-
+#pragma once
+#pragma pack(push, 1)
 
 typedef struct {
     unsigned short signature;
@@ -23,7 +24,6 @@ typedef struct {
 } BitmapInfoHeader; 
 
 
-#pragma pack(push, 1)
 typedef struct {
     unsigned char b;
     unsigned char g;

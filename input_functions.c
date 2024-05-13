@@ -4,23 +4,53 @@
 #include "help_functions.c"
 #include "struct.c"
 
+#define BITS_PER_PIXEl 24
+#define PLANES 1
+#define SIGNATURE 19778
+
 Rgb **read_bmp(char file_name[], BitmapFileHeader* bmfh, BitmapInfoHeader* bmif)
 {
     FILE *f = fopen(file_name, "rb");
-    if (!f) error("Error in 'read_bmp': file was not read sucsessfully");
-    fread(bmfh, 1, sizeof(BitmapFileHeader), f);
-    fread(bmif, 1, sizeof(BitmapInfoHeader), f);
+    if ( f == NULL )
+    {
+        error("Error in 'read_bmp': file was not read sucsessfully", bmfh, bmif, NULL);
+    }
+    unsigned int readed = 0;
+    readed += fread(bmfh, 1, sizeof(BitmapFileHeader), f);
+    if ( bmfh->signature != SIGNATURE)
+    {
+        fclose(f);
+        error("Error in 'read_bmp': file is not bmp format", bmfh, bmif, NULL);
+    }
+    readed += fread(bmif, 1, sizeof(BitmapInfoHeader), f);
+    if ( bmif->planes != PLANES)
+    {
+        error("Error in 'read_bmp': planes are not equal to 1", bmfh, bmif, NULL);
+    }
+    if ( bmif->bitsPerPixel != BITS_PER_PIXEl)
+    {
+        error("Error in 'read_bmp': bits_per_pixel are not equal to 24", bmfh, bmif, NULL);
+    }
     unsigned int H = bmif->height;
     unsigned int W = bmif->width;
+    unsigned int padding = (W * sizeof(Rgb)) % 4;
+    if ( padding ) padding = 4 - padding;
+    size_t total_size = W * sizeof(Rgb) + padding;
     Rgb **arr = (Rgb**)malloc(H * sizeof(Rgb*));
     for(int i = 0; i < H; i++)
     {
-        arr[i] = (Rgb*)malloc(W * sizeof(Rgb) + (W * 3) % 4);
-        fread(arr[i], 1, W * sizeof(Rgb) + (W * 3) % 4,f);
+        arr[i] = (Rgb*)calloc(1, total_size);   
+        readed += fread(arr[i], 1, W * sizeof(Rgb) + padding,f);
+    }
+    if (readed!= bmfh->filesize)
+    {
+        
     }
     fclose(f);
     return arr;
 }
+
+// malloc(W * sizeof(Rgb) + padding)
 
 void print_file_header(BitmapFileHeader header)
 {
@@ -46,15 +76,17 @@ void print_info_header(BitmapInfoHeader header){
 
 
 
-void write_bmp(char file_name[], Rgb **arr, int H, int W, BitmapFileHeader bmfh, BitmapInfoHeader bmif)
+void write_bmp(char file_name[], Rgb **arr, unsigned int H, unsigned int W, BitmapFileHeader bmfh, BitmapInfoHeader bmif)
 {
     FILE *ff = fopen(file_name, "wb");
-    if (!ff) error("Error in 'write_bmp': file was not read sucsessfully");    
+    if (!ff) error("Error in 'write_bmp': file was not read sucsessfully", &bmfh, &bmif, NULL);    
     fwrite(&bmfh, 1, sizeof(BitmapFileHeader), ff);
     fwrite(&bmif, 1, sizeof(BitmapInfoHeader), ff);
+    unsigned int padding = (W * sizeof(Rgb)) % 4;
+    if ( padding ) padding = 4 - padding;
     for(int i = 0; i < H; i++)
     {
-        fwrite(arr[i], 1, W * sizeof(Rgb) + (W * 3) % 4, ff);
+        fwrite(arr[i], 1, W * sizeof(Rgb) + padding, ff);
     }
     fclose(ff);
 }
