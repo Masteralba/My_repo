@@ -3,6 +3,8 @@
 #include <vector>
 #include "ship.hpp"
 
+#define VOID_INDEX -1
+
 enum class CellStatus { unknown='*', empty='0', ship, outofbound};
 
 class Field
@@ -14,21 +16,18 @@ private:
     private:
 
         Ship* ship;
-        int*  ind;
-        const int coord_x, coord_y;
+        int  ind;
         CellStatus cellstatus;
 
     public:
 
-        Cell(int coord_x, int coord_y):coord_x(coord_x), coord_y(coord_y),ship(nullptr),ind(nullptr),cellstatus(CellStatus::unknown){}
+        Cell(int coord_x, int coord_y):ship(nullptr),ind(VOID_INDEX),cellstatus(CellStatus::unknown){}
 
-        ~Cell();
-
-        void set_status(CellStatus status, Ship* ship = nullptr, int* ind = nullptr);
+        void set_status(CellStatus status, Ship* ship = nullptr, int ind = VOID_INDEX);
 
         void set_ship(Ship* ship);
 
-        void set_ind(int* ind);
+        void set_ind(int ind);
 
         CellStatus get_status();
 
@@ -56,7 +55,7 @@ public:
 
     CellStatus get_cell_status(int coord_x, int coord_y);
 
-    void set_cell(int coord_x, int coord_y, CellStatus status, Ship* ship=nullptr, int* ind=nullptr);
+    void set_cell(int coord_x, int coord_y, CellStatus status, Ship* ship=nullptr, int ind=VOID_INDEX);
 
     bool check_ship_intersection(int coord_x, int coord_y, int temp_coord, Orientation orientation);
 
