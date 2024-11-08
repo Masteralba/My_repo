@@ -14,7 +14,10 @@ int main()
     Field field(10, 10);
     field.place_ship(0, 0, ship_manager.get_ship(0));
     field.place_ship(5, 5, ship_manager.get_ship(2));
+    field.attack_cell(2, 3);
     field.attack_cell(5, 5);
+    field.attack_cell(0, 0);
+    field.attack_cell(0, 0);
     ship_manager.show_info();
     field.print();
     return 0;

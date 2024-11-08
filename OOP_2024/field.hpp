@@ -23,11 +23,9 @@ private:
 
         Cell(int coord_x, int coord_y):ship(nullptr),ind(VOID_INDEX),cellstatus(CellStatus::unknown){}
 
-        void set_status(CellStatus status, Ship* ship = nullptr, int ind = VOID_INDEX);
+        void set_status(CellStatus status);
 
-        void set_ship(Ship* ship);
-
-        void set_ind(int ind);
+        void set_ship(Ship* ship, int ind);
 
         CellStatus get_status();
 
@@ -55,7 +53,7 @@ public:
 
     CellStatus get_cell_status(int coord_x, int coord_y);
 
-    void set_cell(int coord_x, int coord_y, CellStatus status, Ship* ship=nullptr, int ind=VOID_INDEX);
+    void set_cell(int coord_x, int coord_y, Ship* ship=nullptr, int ind=VOID_INDEX);
 
     bool check_ship_intersection(int coord_x, int coord_y, int temp_coord, Orientation orientation);
 
