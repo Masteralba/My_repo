@@ -35,6 +35,7 @@ private:
 
     };
 
+    bool double_attack = false;
     int width, height;
     std::vector< std::vector<Cell*>> cells;
 
@@ -53,10 +54,18 @@ public:
     Field& operator = (const Field& field);
 
     Field(Field&& field);
+    
+    void set_double_attack(){this->double_attack = true;}
+
+    int get_height(){return this->height;}
+
+    int get_width(){return this->width;}
 
     Field& operator = (Field&& field);
 
     bool check_ship(int coord_x, int coord_y);
+
+    Ship* get_ship(int coord_x, int coord_y){return this->cells[height-1-coord_y][coord_x]->get_ship();}
 
     void place_ship(int coord_x, int coord_y, Ship* ship);
 

@@ -195,6 +195,11 @@ void Field::attack_cell(int coord_x, int coord_y)
         std::cout << "Defult in Field::attack_cell" << std::endl;
         break;
     }
+    if (this->double_attack)
+    {
+        this->double_attack = false;
+        attack_cell(coord_x, coord_y);
+    }
 }
 
 void Field::print()

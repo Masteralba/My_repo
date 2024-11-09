@@ -18,4 +18,5 @@ public:
     Ship* get_ship(int ind);
     
     void show_info();
+
 };
