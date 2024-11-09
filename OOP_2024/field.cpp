@@ -22,8 +22,6 @@ void Field::Cell::set_status(CellStatus status)
 
 void Field::Cell::set_ship(Ship* ship, int ind) {this->ship = ship; this->ind = ind;}
 
-
-
 CellStatus Field::Cell::get_status() {return this->cellstatus;}
 
 Ship* Field::Cell::get_ship() {return this->ship;}
@@ -70,7 +68,6 @@ Field::Field(const Field& field):width(field.width),height(field.height)
                             if ( field.cells[y_coord][x_coord]->get_ship() == field.cells[temp_y_coord][temp_x_coord]->get_ship() )
                             {
                                 int temp_ind = field.cells[temp_y_coord][temp_x_coord]->get_ind();
-
                                 this->cells[temp_y_coord][temp_x_coord]->set_ship(new_ship, temp_ind);
                             }
                         }
@@ -102,41 +99,39 @@ Field& Field::operator = (Field&& field){
     return *this;
 }
 
-CellStatus Field::get_cell_status(int coord_x, int coord_y)
-{
-    if ( coord_x < this->width && coord_x >= 0 && coord_y < this->height && coord_y >= 0)
-        return this->cells[height-1-coord_y][coord_x]->get_status();
-    else 
-        return CellStatus::outofbound;
-}
-
 void Field::set_cell(int coord_x, int coord_y,Ship* ship, int ind)
 {
     (this->cells[height-1-coord_y][coord_x])->set_ship(ship, ind);
+}
+
+bool Field::check_ship(int coord_x, int coord_y)
+{
+    if ( coord_x >= this->width || coord_x < 0 || coord_y >= this->height || coord_y < 0) return false;
+    return (this->cells[height-1-coord_y][coord_x]->get_ship() != nullptr);
 }
 
 bool Field::check_ship_intersection(int coord_x, int coord_y, int temp_coord, Orientation orientation)
 {
     if ( temp_coord == 0)
     {
-        return ( (this->get_cell_status(coord_x-1, coord_y) == CellStatus::ship) // check for
-        || (this->get_cell_status(coord_x+1, coord_y) == CellStatus::ship)       //  *  0  *
-        ||  (this->get_cell_status(coord_x, coord_y-1) == CellStatus::ship)      //  0  0  0
-        || (this->get_cell_status(coord_x, coord_y+1) == CellStatus::ship)       //  *  0  *
-        || (this->get_cell_status(coord_x, coord_y) == CellStatus::ship));       
+        return ( (this->check_ship(coord_x-1, coord_y) ) // check for
+        || (this->check_ship(coord_x+1, coord_y) )       //  *  0  *
+        ||  (this->check_ship(coord_x, coord_y-1) )      //  0  0  0
+        || (this->check_ship(coord_x, coord_y+1) )       //  *  0  *
+        || (this->check_ship(coord_x, coord_y) ));       
     }
     else
         switch (orientation)
         {
         case Orientation::horisontal :
-            return ( (this->get_cell_status(temp_coord+1, coord_y) == CellStatus::ship) //  *  0  *
-            || (this->get_cell_status(temp_coord, coord_y+1) == CellStatus::ship)       //  *  0  0
-            ||  (this->get_cell_status(temp_coord, coord_y-1) == CellStatus::ship));    //  *  0  * 
+            return ( (this->check_ship(temp_coord+1, coord_y) ) //  *  0  *
+            || (this->check_ship(temp_coord, coord_y+1) )       //  *  0  0
+            ||  (this->check_ship(temp_coord, coord_y-1) ));    //  *  0  * 
             break;
         case Orientation::vertical :
-            return ( (this->get_cell_status(coord_x+1, temp_coord) == CellStatus::ship) //  *  0  *
-            || (this->get_cell_status(coord_x-1, temp_coord) == CellStatus::ship)       //  0  0  0
-            ||  (this->get_cell_status(coord_x, temp_coord+1) == CellStatus::ship));    //  *  *  * 
+            return ( (this->check_ship(coord_x+1, temp_coord) ) //  *  0  *
+            || (this->check_ship(coord_x-1, temp_coord) )       //  0  0  0
+            ||  (this->check_ship(coord_x, temp_coord+1) ));    //  *  *  * 
         default:
             std::cout << "Defalut in Ship::check_ship_intersection" << std::endl;
             return false;

@@ -5,7 +5,7 @@
 
 #define VOID_INDEX -1
 
-enum class CellStatus { unknown='*', empty='0', ship, outofbound};
+enum class CellStatus { unknown='*', empty='0', ship};
 
 class Field
 {
@@ -32,10 +32,15 @@ private:
         Ship* get_ship();
 
         int get_ind();
+
     };
 
     int width, height;
     std::vector< std::vector<Cell*>> cells;
+
+    void set_cell(int coord_x, int coord_y, Ship* ship=nullptr, int ind=VOID_INDEX);
+
+    bool check_ship_intersection(int coord_x, int coord_y, int temp_coord, Orientation orientation);
 
 public:
 
@@ -51,11 +56,7 @@ public:
 
     Field& operator = (Field&& field);
 
-    CellStatus get_cell_status(int coord_x, int coord_y);
-
-    void set_cell(int coord_x, int coord_y, Ship* ship=nullptr, int ind=VOID_INDEX);
-
-    bool check_ship_intersection(int coord_x, int coord_y, int temp_coord, Orientation orientation);
+    bool check_ship(int coord_x, int coord_y);
 
     void place_ship(int coord_x, int coord_y, Ship* ship);
 
