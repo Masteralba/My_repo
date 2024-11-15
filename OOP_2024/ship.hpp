@@ -38,6 +38,8 @@ public:
 
     ~Ship();
 
+    bool is_destroyed();
+
     Orientation get_orientation();
 
     int get_lenght();

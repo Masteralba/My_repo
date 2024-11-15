@@ -16,6 +16,8 @@ public:
     ~ShipManager();
 
     Ship* get_ship(int ind);
+
+    int destroyed_number();
     
     void show_info();
 

@@ -1,22 +1,26 @@
 #pragma once
 #include <random>
 #include <algorithm>
-#include <queue>
+#include <vector>
 #include "abilities.hpp"
 #include "field.hpp"
 
-class Abilitiesmanager
+class AbilitiesManager
 {
     private:
+
+    bool double_attack;
     
-    std::queue<Iability*> abilities;
+    std::vector<Iability*> abilities;
 
     public:
 
-    Abilitiesmanager();
+    AbilitiesManager();
 
     void use_ability(Field* field);
 
     void add_ability();
+
+    void print_abilityes();
 
 };

@@ -9,7 +9,7 @@ main.o: main.cpp
 shipmanager.o: shipmanager.cpp shipmanager.hpp
 	g++ -c -g shipmanager.cpp -o shipmanager.o
 
-field.o: field.cpp field.hpp
+field.o: field.cpp field.hpp myexception.hpp
 	g++ -c -g field.cpp -o field.o
 
 ship.o: ship.cpp ship.hpp
@@ -18,8 +18,9 @@ ship.o: ship.cpp ship.hpp
 abilities.o: abilities.cpp abilities.hpp
 	g++ -c -g abilities.cpp -o abilities.o
 
-abilitiesmanager.o: abilitiesmanager.cpp abilitiesmanager.hpp
+abilitiesmanager.o: abilitiesmanager.cpp abilitiesmanager.hpp myexception.hpp
 	g++ -c -g abilitiesmanager.cpp -o abilitiesmanager.o
+
 
 make clean:
 	rm *.o game

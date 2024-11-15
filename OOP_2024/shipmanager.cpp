@@ -34,3 +34,10 @@ void ShipManager::show_info()
     for(size_t index_iterator=0; index_iterator<this->num_of_ships; index_iterator++) this->ships[index_iterator]->print_segments();
     std::cout << std::endl;
 }    
+
+int ShipManager::destroyed_number()
+{
+    int counter = 0;
+    for (auto ship: this->ships) if (ship->is_destroyed()) counter++;
+    return counter; 
+}

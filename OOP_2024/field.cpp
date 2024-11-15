@@ -2,7 +2,7 @@
 #include <vector>
 #include "ship.hpp"
 #include "field.hpp"
-
+#include "myexception.hpp"
 
 void Field::Cell::set_status(CellStatus status)
 {
@@ -148,9 +148,12 @@ void Field::place_ship(int coord_x, int coord_y, Ship* ship)
     case Orientation::horisontal :
         for(size_t temp_coord=coord_x; temp_coord < coord_x + ship->get_lenght(); temp_coord++)
         {
+            
             if (!this->check_ship_intersection(coord_x, coord_y, temp_coord, Orientation::horisontal))
             {
                 this->set_cell(temp_coord, coord_y, ship, index_counter++);
+            } else{
+                throw (ShipIntersection(this, temp_coord, coord_y));
             }
         }
         break;
@@ -160,6 +163,9 @@ void Field::place_ship(int coord_x, int coord_y, Ship* ship)
             if (!this->check_ship_intersection(coord_x, coord_y, temp_coord, Orientation::vertical))
             {
                 this->set_cell(coord_x, temp_coord, ship, index_counter++);
+            }else
+            {
+                throw (ShipIntersection(this, coord_x, temp_coord));
             }
         }
         break;
@@ -171,7 +177,8 @@ void Field::place_ship(int coord_x, int coord_y, Ship* ship)
 
 void Field::attack_cell(int coord_x, int coord_y)
 {
-    if ( coord_x<0 || coord_y<0 || coord_x >= this->width || coord_y >= this->height) return;
+
+    if ( coord_x<0 || coord_y<0 || coord_x >= this->width || coord_y >= this->height) throw (AttackOutOfBounds(this, coord_x, coord_y));
     switch (this->cells[height-1-coord_y][coord_x]->get_status())
     {
     case CellStatus::ship:
