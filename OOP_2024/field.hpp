@@ -3,7 +3,9 @@
 #include <vector>
 #include "ship.hpp"
 
-enum class CellStatus { unknown='*', empty='0', ship, outofbound};
+#define VOID_INDEX -1
+
+enum class CellStatus { unknown='*', empty='0', ship};
 
 class Field
 {
@@ -14,31 +16,32 @@ private:
     private:
 
         Ship* ship;
-        int*  ind;
-        const int coord_x, coord_y;
+        int  ind;
         CellStatus cellstatus;
 
     public:
 
-        Cell(int coord_x, int coord_y):coord_x(coord_x), coord_y(coord_y),ship(nullptr),ind(nullptr),cellstatus(CellStatus::unknown){}
+        Cell(int coord_x, int coord_y):ship(nullptr),ind(VOID_INDEX),cellstatus(CellStatus::unknown){}
 
-        ~Cell();
+        void set_status(CellStatus status);
 
-        void set_status(CellStatus status, Ship* ship = nullptr, int* ind = nullptr);
-
-        void set_ship(Ship* ship);
-
-        void set_ind(int* ind);
+        void set_ship(Ship* ship, int ind);
 
         CellStatus get_status();
 
         Ship* get_ship();
 
         int get_ind();
+
     };
 
+    bool double_attack = false;
     int width, height;
     std::vector< std::vector<Cell*>> cells;
+
+    void set_cell(int coord_x, int coord_y, Ship* ship=nullptr, int ind=VOID_INDEX);
+
+    bool check_ship_intersection(int coord_x, int coord_y, int temp_coord, Orientation orientation);
 
 public:
 
@@ -51,14 +54,18 @@ public:
     Field& operator = (const Field& field);
 
     Field(Field&& field);
+    
+    void set_double_attack(){this->double_attack = true;}
+
+    int get_height(){return this->height;}
+
+    int get_width(){return this->width;}
 
     Field& operator = (Field&& field);
 
-    CellStatus get_cell_status(int coord_x, int coord_y);
+    bool check_ship(int coord_x, int coord_y);
 
-    void set_cell(int coord_x, int coord_y, CellStatus status, Ship* ship=nullptr, int* ind=nullptr);
-
-    bool check_ship_intersection(int coord_x, int coord_y, int temp_coord, Orientation orientation);
+    Ship* get_ship(int coord_x, int coord_y){return this->cells[height-1-coord_y][coord_x]->get_ship();}
 
     void place_ship(int coord_x, int coord_y, Ship* ship);
 

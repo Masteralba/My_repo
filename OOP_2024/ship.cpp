@@ -84,6 +84,13 @@ void Ship::attack_segment(int ind)
     this->segments[ind]->attack();
 }
 
+bool Ship::is_destroyed()
+{
+    bool destroyed = true;
+    for (auto segment: this->segments) if (segment->get_condition() != Condition::destroyed) destroyed = false;
+    return destroyed;
+}
+
 void Ship::print_segment(int ind)
 {
     if ( ind >= MAX_SHIP_LENGHT || ind < MIN_SHIP_LENGHT-1)
