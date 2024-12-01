@@ -1,6 +1,7 @@
 #include <iostream>
 #include "abilitiesmanager.hpp"
 #include "myexception.hpp"
+#include "flags.hpp"
 
 AbilitiesManager::AbilitiesManager()
 {
@@ -11,13 +12,13 @@ AbilitiesManager::AbilitiesManager()
     abilities = temp_vector;
 }
 
-void AbilitiesManager::use_ability(Field* field)
+void AbilitiesManager::use_ability(Field* field, Flags* flags)
 {
     if (!abilities.size())
     {
         throw(AbilityUseInEmptyManger(this));
     }else{
-        abilities[0]->use_skill(field);
+        abilities[0]->use_skill(field, flags);
         abilities.erase(abilities.begin());
     }
 }
