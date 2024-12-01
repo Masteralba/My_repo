@@ -5,7 +5,7 @@
 
 #define VOID_INDEX -1
 
-enum class CellStatus { unknown='*', empty='0', ship};
+enum class CellStatus { unknown='*', empty='_', ship};
 
 class Field
 {
@@ -21,7 +21,7 @@ private:
 
     public:
 
-        Cell(int coord_x, int coord_y):ship(nullptr),ind(VOID_INDEX),cellstatus(CellStatus::unknown){}
+        Cell():ship(nullptr),ind(VOID_INDEX),cellstatus(CellStatus::empty){}
 
         void set_status(CellStatus status);
 
@@ -32,16 +32,16 @@ private:
         Ship* get_ship();
 
         int get_ind();
-
     };
 
-    bool double_attack = false;
     int width, height;
     std::vector< std::vector<Cell*>> cells;
 
-    void set_cell(int coord_x, int coord_y, Ship* ship=nullptr, int ind=VOID_INDEX);
+    bool check_ship_in_square(int coord_x, int coord_y);
 
-    bool check_ship_intersection(int coord_x, int coord_y, int temp_coord, Orientation orientation);
+    void check_ship_intersection(int coord_x, int coord_y, Ship* ship);
+
+    void set_cell(int coord_x, int coord_y, Ship* ship=nullptr, int ind=VOID_INDEX);
 
 public:
 
@@ -54,24 +54,21 @@ public:
     Field& operator = (const Field& field);
 
     Field(Field&& field);
-    
-    void set_double_attack(){this->double_attack = true;}
-
-    int get_height(){return this->height;}
-
-    int get_width(){return this->width;}
 
     Field& operator = (Field&& field);
 
-    bool check_ship(int coord_x, int coord_y);
+    int get_width(){return this->width;}
 
-    Ship* get_ship(int coord_x, int coord_y){return this->cells[height-1-coord_y][coord_x]->get_ship();}
+    int get_height(){return this->height;}
+
+    bool check_ship_in_cell(int coord_x, int coord_y);
+    
+    Cell* get_cell(int coord_x, int coord_y);
 
     void place_ship(int coord_x, int coord_y, Ship* ship);
 
-    void attack_cell(int coord_x, int coord_y);
+    void attack_cell(int coord_x, int coord_y, bool double_attack);
 
     void print();
 
 };
-

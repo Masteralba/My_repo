@@ -41,3 +41,9 @@ int ShipManager::destroyed_number()
     for (auto ship: this->ships) if (ship->is_destroyed()) counter++;
     return counter; 
 }
+
+bool ShipManager::all_ships_destroyed()
+{
+    for(auto ship: this->ships) if (!ship->is_destroyed()) return false;
+    return true;
+}

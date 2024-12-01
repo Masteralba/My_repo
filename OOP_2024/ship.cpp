@@ -27,6 +27,8 @@ void Ship::Segment::attack()
 
 Condition Ship::Segment::get_condition(){return this->condition;}
 
+void Ship::Segment::set_condition(Condition condition){this->condition = condition;}
+
 Ship::Ship(int lenght, Orientation orientation):lenght(lenght)
 {
     
@@ -82,6 +84,16 @@ void Ship::attack_segment(int ind)
         exit(1);
     } 
     this->segments[ind]->attack();
+}
+
+void Ship::destroy_segment(int ind)
+{
+    if ( ind >= MAX_SHIP_LENGHT || ind < MIN_SHIP_LENGHT-1)
+    {
+         std::cerr << "Incorrect attacking index" << std::endl;
+        exit(1);
+    }
+    this->segments[ind]->set_condition(Condition::destroyed);
 }
 
 bool Ship::is_destroyed()

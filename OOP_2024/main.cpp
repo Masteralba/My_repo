@@ -1,68 +1,26 @@
 #include <iostream>
 #include <vector>
-
-#include "ship.hpp"
-#include "field.hpp"
-#include "shipmanager.hpp"
-#include "abilitiesmanager.hpp"
-#include "myexception.hpp"
-
-void attack_ship(ShipManager* shipmanager, Field* field, AbilitiesManager* abilitiesmanager, int x_coord, int y_coord)
-{
-    int destroyed_number_before = shipmanager->destroyed_number();
-    try{
-        field->attack_cell(x_coord, y_coord);
-    }catch(AttackOutOfBounds& e)
-    {
-        std::cout << e.what();
-        return;
-    }
-    int destroyed_nuber_after = shipmanager->destroyed_number();
-    if ( destroyed_nuber_after > destroyed_number_before) abilitiesmanager->add_ability();
-}
+#include "game.hpp"
 
 int main()
 {
-    int num_of_ships = 4;
-    std::vector<int>  lenghts = {1, 2, 3, 4};
-    std::vector<Orientation> orientations = {Orientation::horisontal, Orientation::horisontal, Orientation::vertical,Orientation::vertical};
-    ShipManager* ship_manager = new ShipManager(4, lenghts, orientations);
-    AbilitiesManager* abilitiesmanager = new AbilitiesManager();
-    Field* field = new Field(10, 10);
-    field->place_ship(0, 0, ship_manager->get_ship(0));
-    field->place_ship(5, 5, ship_manager->get_ship(2));
-    field->place_ship(511, 115, ship_manager->get_ship(2));
-    try{
-    attack_ship(ship_manager, field, abilitiesmanager, 211, 322);
-    }catch(AttackOutOfBounds& e)
-    {
-        std::cout << e.what();
-    }
-    ship_manager->show_info();
-    abilitiesmanager->print_abilityes();
-    try{
-        abilitiesmanager->use_ability(field);
-    }catch(AbilityUseInEmptyManger& e)
-    {
-        std::cout << e.what();
-    }
-    try{
-        abilitiesmanager->use_ability(field);
-    }catch(AbilityUseInEmptyManger& e)
-    {
-        std::cout << e.what();
-    }
-    try{
-        abilitiesmanager->use_ability(field);
-    }catch(AbilityUseInEmptyManger& e)
-    {
-        std::cout << e.what();
-    }
-    try{
-        abilitiesmanager->use_ability(field);
-    }catch(AbilityUseInEmptyManger& e)
-    {
-        std::cout << e.what();
-    }
+    int width = 10;
+    int height = 10;
+    int number_of_ships=1;
+    std::vector<int> lenghts = {4};
+    std::vector<Orientation> orientations = {Orientation::horisontal, Orientation::horisontal, Orientation::horisontal, 
+    Orientation::vertical, Orientation::vertical };
+    Field* field = new Field(width, height);
+    ShipManager* shipmanager = new ShipManager(number_of_ships, lenghts, orientations);
+    Field* enemy_field = new Field(width, height);
+    ShipManager* enemy_shipmanager = new ShipManager(number_of_ships, lenghts, orientations);
+    std::vector<std::vector<int>> coorditanes = {{0, 0}};
+    Game* game = new Game(field, shipmanager, enemy_field, enemy_shipmanager, new AbilitiesManager(), new Flags());
+    game->player_start(coorditanes);
+    game->enemy_start(coorditanes);
+    game->field->print();
+    printf("%c", '\n');
+    game->enemy_field->print();
+    game->main(width, height, number_of_ships, lenghts, orientations, coorditanes);
     return 0;
 }

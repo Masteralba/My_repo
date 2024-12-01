@@ -6,7 +6,7 @@
 #define MIN_SHIP_LENGHT 1
 
 enum class Condition { undamaged, damaged, destroyed};
-enum class Orientation { vertical, horisontal};
+enum class Orientation { vertical='v', horisontal='h'};
 
 class Ship{
 private:
@@ -21,6 +21,8 @@ private:
         void attack();
 
         Condition get_condition();
+
+        void set_condition(Condition condition);
 
     };
 
@@ -45,6 +47,8 @@ public:
     int get_lenght();
 
     void attack_segment(int ind);
+
+    void destroy_segment(int ind);
 
     void print_segment(int ind);
 

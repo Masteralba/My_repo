@@ -30,45 +30,46 @@ int Field::Cell::get_ind() {return this->ind;}
 
 Field::Field(int width, int height):width(width),height(height)
 {
-        for(size_t y_coord=0; y_coord < this->height; y_coord++)
+        for(size_t coord_y=0; coord_y < this->height; coord_y++)
         {
             std::vector<Cell*> cell_array;
-            for(size_t x_coord=0;x_coord<this->width; x_coord++) cell_array.push_back(new Cell(y_coord,x_coord));
+            for(size_t coord_x=0;coord_x<this->width; coord_x++) cell_array.push_back(new Cell());
             this->cells.push_back(cell_array);
         }
 }
 
 Field::~Field()
 {
-    for(size_t y_coord=0; y_coord < this->height; y_coord++)
-        for(size_t x_coord=0; x_coord< this->width; x_coord++)
-            delete this->cells[y_coord][x_coord];
+    for(size_t coord_y=0; coord_y < this->height; coord_y++)
+        for(size_t coord_x=0; coord_x< this->width; coord_x++)
+            delete this->cells[coord_y][coord_x];
 }
 
 Field::Field(const Field& field):width(field.width),height(field.height)
 {
-    for(size_t y_coord=0; y_coord<this->height; y_coord++)
+    for(size_t coord_y=0; coord_y<this->height; coord_y++)
     {
         std::vector<Cell*> cell_array;
-        for(size_t x_coord=0; x_coord<this->width; x_coord++) cell_array.push_back(new Cell(y_coord, x_coord));
+        for(size_t coord_x=0; coord_x<this->width; coord_x++) cell_array.push_back(new Cell());
         this->cells.push_back(cell_array);
     }
-    for(size_t y_coord=0; y_coord<this->height; y_coord++)
+    for(size_t coord_y=0; coord_y<this->height; coord_y++)
     {
-        for(size_t x_coord=0; x_coord<this->width; x_coord++)
+        for(size_t coord_x=0; coord_x<this->width; coord_x++)
         {
-            if ( field.cells[y_coord][x_coord]->get_ship() != nullptr)
+            if ( field.cells[coord_y][coord_x]->get_ship() != nullptr)
             {
-                Ship* new_ship = new Ship(*field.cells[y_coord][x_coord]->get_ship());
+                Ship* new_ship = new Ship(*field.cells[coord_y][coord_x]->get_ship());
                 {
-                    for(size_t temp_y_coord=0; temp_y_coord<this->height; temp_y_coord++)
+                    for(size_t temp_coord_y=0; temp_coord_y<this->height; temp_coord_y++)
                     {
-                        for(size_t temp_x_coord=0; temp_x_coord<this->width; temp_x_coord++)
+                        for(size_t temp_coord_x=0; temp_coord_x<this->width; temp_coord_x++)
                         {
-                            if ( field.cells[y_coord][x_coord]->get_ship() == field.cells[temp_y_coord][temp_x_coord]->get_ship() )
+                            if ( field.cells[coord_y][coord_x]->get_ship() == field.cells[temp_coord_y][temp_coord_x]->get_ship() )
                             {
-                                int temp_ind = field.cells[temp_y_coord][temp_x_coord]->get_ind();
-                                this->cells[temp_y_coord][temp_x_coord]->set_ship(new_ship, temp_ind);
+                                int temp_ind = field.cells[temp_coord_y][temp_coord_x]->get_ind();
+
+                                this->cells[temp_coord_y][temp_coord_x]->set_ship(new_ship, temp_ind);
                             }
                         }
                     }
@@ -99,113 +100,115 @@ Field& Field::operator = (Field&& field){
     return *this;
 }
 
+Field::Cell* Field::get_cell(int coord_x, int coord_y)
+{
+    if ( coord_x < this->width && coord_x >= 0 && coord_y < this->height && coord_y >= 0)
+        return this->cells[height-1-coord_y][coord_x];
+    else
+    {
+        throw CellOutOfBounds(this, coord_x, coord_y);
+    }
+}
+
 void Field::set_cell(int coord_x, int coord_y,Ship* ship, int ind)
 {
-    (this->cells[height-1-coord_y][coord_x])->set_ship(ship, ind);
-}
-
-bool Field::check_ship(int coord_x, int coord_y)
-{
-    if ( coord_x >= this->width || coord_x < 0 || coord_y >= this->height || coord_y < 0) return false;
-    return (this->cells[height-1-coord_y][coord_x]->get_ship() != nullptr);
-}
-
-bool Field::check_ship_intersection(int coord_x, int coord_y, int temp_coord, Orientation orientation)
-{
-    if ( temp_coord == 0)
+    try{
+        (this->get_cell(coord_x, coord_y))->set_ship(ship, ind);
+        (this->get_cell(coord_x, coord_y))->set_status(CellStatus::ship);
+    }catch(CellOutOfBounds& e)
     {
-        return ( (this->check_ship(coord_x-1, coord_y) ) // check for
-        || (this->check_ship(coord_x+1, coord_y) )       //  *  0  *
-        ||  (this->check_ship(coord_x, coord_y-1) )      //  0  0  0
-        || (this->check_ship(coord_x, coord_y+1) )       //  *  0  *
-        || (this->check_ship(coord_x, coord_y) ));       
+        throw SetCellOutOfBounds(this, coord_x, coord_y);
     }
-    else
-        switch (orientation)
-        {
-        case Orientation::horisontal :
-            return ( (this->check_ship(temp_coord+1, coord_y) ) //  *  0  *
-            || (this->check_ship(temp_coord, coord_y+1) )       //  *  0  0
-            ||  (this->check_ship(temp_coord, coord_y-1) ));    //  *  0  * 
-            break;
-        case Orientation::vertical :
-            return ( (this->check_ship(coord_x+1, temp_coord) ) //  *  0  *
-            || (this->check_ship(coord_x-1, temp_coord) )       //  0  0  0
-            ||  (this->check_ship(coord_x, temp_coord+1) ));    //  *  *  * 
-        default:
-            std::cout << "Defalut in Ship::check_ship_intersection" << std::endl;
-            return false;
-            break;
+}
+
+bool Field::check_ship_in_cell(int coord_x, int coord_y)
+{
+    Cell* cell = nullptr;
+    try{
+        Cell* cell = get_cell(coord_x, coord_y);
+        return cell->get_ship() != nullptr;
         }
+    catch(CellOutOfBounds& e){
+        return false;}
+}
+
+bool Field::check_ship_in_square(int coord_x, int coord_y)
+{
+    return ( check_ship_in_cell(coord_x-1, coord_y) || check_ship_in_cell(coord_x-1, coord_y+1) || check_ship_in_cell(coord_x-1, coord_y-1) ||
+    check_ship_in_cell(coord_x, coord_y) || check_ship_in_cell(coord_x, coord_y+1) || check_ship_in_cell(coord_x, coord_y-1) ||
+    check_ship_in_cell(coord_x+1, coord_y) || check_ship_in_cell(coord_x+1, coord_y+1) || check_ship_in_cell(coord_x+1, coord_y-1) );
+}
+
+void Field::check_ship_intersection(int coord_x, int coord_y, Ship* ship)
+{
+    for(size_t index_counter = 0; index_counter < ship->get_lenght(); index_counter++)
+    {
+        if (ship->get_orientation() == Orientation::horisontal)
+        {
+            if (check_ship_in_square(coord_x+index_counter, coord_y)) throw ShipIntersection(this, coord_x+index_counter, coord_y);
+        }else
+        {
+            if (check_ship_in_square(coord_x, coord_y+index_counter)) throw ShipIntersection(this, coord_x, coord_y+index_counter);
+        }
+    }
 }
 
 void Field::place_ship(int coord_x, int coord_y, Ship* ship)
 {
-    if ( coord_x<0 || coord_y<0 || coord_x >= this->width || coord_y >= this->height) return;
-    int index_counter = 0;
-    switch (ship->get_orientation())
+    try{check_ship_intersection(coord_x, coord_y, ship);}
+    catch(ShipIntersection& e) {throw e;}
+    for(size_t index_counter = 0; index_counter < ship->get_lenght(); index_counter++)
     {
-    case Orientation::horisontal :
-        for(size_t temp_coord=coord_x; temp_coord < coord_x + ship->get_lenght(); temp_coord++)
+        if (ship->get_orientation() == Orientation::horisontal)
         {
-            
-            if (!this->check_ship_intersection(coord_x, coord_y, temp_coord, Orientation::horisontal))
-            {
-                this->set_cell(temp_coord, coord_y, ship, index_counter++);
-            } else{
-                throw (ShipIntersection(this, temp_coord, coord_y));
-            }
+            if (coord_x+index_counter >= this->width || coord_x+index_counter < 0 || coord_y >= this->height || coord_y < 0)
+                throw(IncorrectShipPlace(this, coord_x+index_counter, coord_y, ship->get_orientation(), ship->get_lenght()) );
         }
-        break;
-    case Orientation::vertical :
-        for(size_t temp_coord=coord_y; temp_coord < coord_y + ship->get_lenght(); temp_coord++)
+        else
         {
-            if (!this->check_ship_intersection(coord_x, coord_y, temp_coord, Orientation::vertical))
-            {
-                this->set_cell(coord_x, temp_coord, ship, index_counter++);
-            }else
-            {
-                throw (ShipIntersection(this, coord_x, temp_coord));
-            }
+            if (coord_x >= this->width || coord_x < 0 || coord_y+index_counter >= this->height || coord_y+index_counter < 0)
+                throw(IncorrectShipPlace(this, coord_x, coord_y+index_counter, ship->get_orientation(), ship->get_lenght()) );
         }
-        break;
-    default:
-        std::cout << "Default in Field::place_ship";
-        break;
+    }
+
+    for(size_t index_counter = 0; index_counter < ship->get_lenght(); index_counter++)
+    {
+        if (ship->get_orientation() == Orientation::horisontal)
+        {
+            this->set_cell(coord_x+index_counter, coord_y, ship, index_counter);
+        }else this->set_cell(coord_x, coord_y+index_counter, ship, index_counter);
     }
 }
 
-void Field::attack_cell(int coord_x, int coord_y)
+void Field::attack_cell(int coord_x, int coord_y, bool double_attack)
 {
-
-    if ( coord_x<0 || coord_y<0 || coord_x >= this->width || coord_y >= this->height) throw (AttackOutOfBounds(this, coord_x, coord_y));
-    switch (this->cells[height-1-coord_y][coord_x]->get_status())
+    Cell* attacking_cell = nullptr;
+    try{
+        attacking_cell = this->get_cell(coord_x, coord_y);
+    }catch (CellOutOfBounds& e){throw AttackOutOfBounds(this, coord_x, coord_y);}
+    switch (attacking_cell->get_status())
     {
     case CellStatus::ship:
     {
-        int attack_index = this->cells[height-1-coord_y][coord_x]->get_ind();
-        this->cells[height-1-coord_y][coord_x]->get_ship()->attack_segment(attack_index);
+        int attack_index = attacking_cell->get_ind();
+        attacking_cell->get_ship()->attack_segment(attack_index);
+        if (double_attack) attacking_cell->get_ship()->destroy_segment(attack_index);
         break;
     }
     case CellStatus::empty:
         std::cout << "The empty cell was attacked" << std::endl;
         break;
     case CellStatus::unknown:
-        if ( this->cells[height-1-coord_y][coord_x]->get_ship() != nullptr)
+        if ( attacking_cell->get_ship() != nullptr)
         {
-            this->cells[height-1-coord_y][coord_x]->set_status(CellStatus::ship);
-            this->attack_cell(coord_x, coord_y);
+            attacking_cell->set_status(CellStatus::ship);
+            this->attack_cell(coord_x, coord_y, double_attack);
         }
-        else this->cells[height-1-coord_y][coord_x]->set_status(CellStatus::empty);
+        else attacking_cell->set_status(CellStatus::empty);
         break;
     default:
-        std::cout << "Defult in Field::attack_cell" << std::endl;
+        std::cout << "Default in Field::attack_cell" << std::endl;
         break;
-    }
-    if (this->double_attack)
-    {
-        this->double_attack = false;
-        attack_cell(coord_x, coord_y);
     }
 }
 
@@ -223,5 +226,3 @@ void Field::print()
         std::cout << std::endl;
     }
 }
-
-

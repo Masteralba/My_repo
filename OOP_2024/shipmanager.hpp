@@ -18,6 +18,8 @@ public:
     Ship* get_ship(int ind);
 
     int destroyed_number();
+
+    bool all_ships_destroyed();
     
     void show_info();
 

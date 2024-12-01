@@ -4,12 +4,11 @@
 #include <vector>
 #include "abilities.hpp"
 #include "field.hpp"
+#include "flags.hpp"
 
 class AbilitiesManager
 {
     private:
-
-    bool double_attack;
     
     std::vector<Iability*> abilities;
 
@@ -17,7 +16,7 @@ class AbilitiesManager
 
     AbilitiesManager();
 
-    void use_ability(Field* field);
+    void use_ability(Field* field, Flags* flags);
 
     void add_ability();
 
