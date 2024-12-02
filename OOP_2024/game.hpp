@@ -6,15 +6,13 @@
 #include "abilitiesmanager.hpp"
 #include "myexception.hpp"
 #include "flags.hpp"
+#include "gamestate.hpp"
 
 class Game
 {
     public:
 
-    Game(Field* field, ShipManager* shipmanager, Field* enemy_field, 
-    ShipManager* enemy_shipmanager, AbilitiesManager* abilitiesmanager, Flags* flags):
-    field(field), shipmanager(shipmanager),  enemy_field(enemy_field), enemy_shipmanager(enemy_shipmanager),
-    abilitiesmanager(abilitiesmanager), flags(flags){}
+    Game(GameState* gamestate):gamestate(gamestate){}
 
     void attack_enemy_field(int x_coord, int y_coord);
 
@@ -22,23 +20,19 @@ class Game
 
     void use_ability();
 
-    void main(int width, int height, int number_of_ships, std::vector<int> lenghts,
-    std::vector<Orientation> orientations, std::vector<std::vector<int>> coorditanes);
+    void main();
 
-    void player_start(std::vector<std::vector<int>> coordinates_vector);
+    void player_start();
 
-    void enemy_start(std::vector<std::vector<int>> coordinates_vector);
+    void enemy_start();
 
-    void round();
+    void player_tern(int coord_x, int coord_y, bool ability_flag=false);
 
-    Field* field;
+    void enemy_tern();
 
-    Field* enemy_field;
+    void round(int coord_x, int coord_y, bool ability_flag=false);
 
     private:
     
-    ShipManager* shipmanager;
-    ShipManager* enemy_shipmanager;
-    AbilitiesManager* abilitiesmanager;
-    Flags* flags;
+    GameState* gamestate;
 };
