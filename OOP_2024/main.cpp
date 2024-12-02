@@ -1,105 +1,72 @@
 #include <iostream>
 #include <vector>
-#include <string>
-#include <bits/stdc++.h>
-#include "fstream"
-#include "gamestate.hpp"
 
-std::ostream& operator << (std::ostream &os, const GameState &gamestate)
-{
-    std::string data;
-    data = std::to_string(gamestate.width) + 
-    "|" + std::to_string(gamestate.height)
-     + "|" + std::to_string(gamestate.ship_number);
-    for (auto elem: gamestate.lenghts) data += "|" + std::to_string(elem);
-    for(size_t i=0; i<gamestate.ship_number; i++)
-    {
-        if (gamestate.orientations[i] == Orientation::horisontal) data += "|h";
-        else data += "|v";
-    }
-    for (auto elem: gamestate.coordinates) data += "|" + std::to_string(elem[0]) + ',' + std::to_string(elem[1]);
-    for (auto elem: gamestate.ship_conditions)
-    {
-        data += "|";
-        for (auto condition: elem) data += std::to_string(condition);
-    } 
-    return os << data;
-}
+#include "ship.hpp"
+#include "field.hpp"
+#include "shipmanager.hpp"
+#include "abilitiesmanager.hpp"
+#include "myexception.hpp"
 
-void adv_tokenizer(std::string s, char del)
+void attack_ship(ShipManager* shipmanager, Field* field, AbilitiesManager* abilitiesmanager, int x_coord, int y_coord)
 {
-    std::stringstream ss(s);
-    std::string word;
-    while (!ss.eof()) {
-        getline(ss, word, del);
-        std::cout << word << std::endl;
-    }
-}
-
-std::istream& operator >> (std::istream& in, GameState &gamestate)
-{
-    std::string input_string;
-    in >> input_string;
-    std::stringstream ss(input_string);
-    std::string word;
-    int counter = -1;
-    while (!ss.eof())
+    int destroyed_number_before = shipmanager->destroyed_number();
+    try{
+        field->attack_cell(x_coord, y_coord, abilitiesmanager->get_flag());
+        if (abilitiesmanager->get_flag()) abilitiesmanager->change_flag();
+    }catch(AttackOutOfBounds& e)
     {
-        counter++;
-        getline(ss, word, '|');
-        if (counter <= 2){
-            if (counter == 0) gamestate.width = std::stoi(word);
-            if (counter == 1) gamestate.height = std::stoi(word);
-            if (counter == 2) gamestate.ship_number = std::stoi(word);
-        }
-        else{
-            if (2 < counter && counter <= 2 + gamestate.ship_number)
-            {
-                gamestate.lenghts.push_back(std::stoi(word)); 
-            }
-            if (2 + gamestate.ship_number < counter && counter <= 2 + gamestate.ship_number*2)
-            {
-                gamestate.orientations.push_back(word == "h" ? 
-                Orientation::horisontal : Orientation::vertical); 
-            }
-            if (2 + gamestate.ship_number*2 < counter && counter <= 2 + gamestate.ship_number*3)
-                {}
-            if (2 + gamestate.ship_number*3 < counter && counter <= 2 + gamestate.ship_number*4) {}
-        }      
+        std::cout << e.what();
+        return;
     }
-    return in;
+    int destroyed_nuber_after = shipmanager->destroyed_number();
+    if ( destroyed_nuber_after > destroyed_number_before) abilitiesmanager->add_ability();
 }
 
 int main()
 {
-    std::vector<int> lenghts = {1, 2, 3};
-    std::vector<Orientation> orientations = {Orientation::horisontal, Orientation::horisontal, Orientation::vertical};
-    std::vector<std::vector<int>> coordinates = {{0, 0}, {1, 2}, {5, 6}};
-    std::vector<std::vector<int>> ship_conditions = {{0}, {1, 2, 0}, {0, 0, 1}};
-    GameState* gamestate = new GameState(10, 12, 3, lenghts, orientations, coordinates, ship_conditions);
-    std::ofstream out("data.txt");
-    if (out.is_open())
+    int num_of_ships = 4;
+    std::vector<int>  lenghts = {1, 2, 3, 4};
+    std::vector<Orientation> orientations = {Orientation::horisontal, Orientation::horisontal, Orientation::vertical,Orientation::vertical};
+    ShipManager* ship_manager = new ShipManager(4, lenghts, orientations);
+    AbilitiesManager* abilitiesmanager = new AbilitiesManager();
+    Field* field = new Field(10, 10);
+    field->place_ship(0, 0, ship_manager->get_ship(0));
+    field->place_ship(5, 5, ship_manager->get_ship(2));
+    try{
+        field->place_ship(511, 115, ship_manager->get_ship(2));
+    }catch(ShipIntersection& e) {std::cout << e.what();}
+    catch(IncorrectShipPlace &e) {std::cout << e.what();}
+    try{
+    attack_ship(ship_manager, field, abilitiesmanager, 211, 322);
+    }catch(AttackOutOfBounds& e)
     {
-        out << *gamestate << std::endl;
+        std::cout << e.what();
     }
-    out.close();
-
-    GameState* newgamestate = new GameState();
- 
-    std::ifstream in("data.txt"); // окрываем файл для чтения
-    if (in.is_open())
+    ship_manager->show_info();
+    abilitiesmanager->print_abilityes();
+    try{
+        abilitiesmanager->use_ability(field);
+    }catch(AbilityUseInEmptyManger& e)
     {
-        in >> *newgamestate;
+        std::cout << e.what();
     }
-
-    in.close();
-
-    std::cout << newgamestate->width << " " << newgamestate->height <<
-    " " << newgamestate->ship_number << " " << std::endl;
-    for (auto elem: newgamestate->lenghts) std::cout << elem << " ";
-    std::cout << std::endl;
-    for (auto elem: newgamestate->orientations) std::cout << static_cast<char>(elem) << " ";
-    std::cout << std::endl;
-
+    try{
+        abilitiesmanager->use_ability(field);
+    }catch(AbilityUseInEmptyManger& e)
+    {
+        std::cout << e.what();
+    }
+    try{
+        abilitiesmanager->use_ability(field);
+    }catch(AbilityUseInEmptyManger& e)
+    {
+        std::cout << e.what();
+    }
+    try{
+        abilitiesmanager->use_ability(field);
+    }catch(AbilityUseInEmptyManger& e)
+    {
+        std::cout << e.what();
+    }
     return 0;
 }

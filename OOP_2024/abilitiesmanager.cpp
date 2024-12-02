@@ -5,6 +5,7 @@
 
 AbilitiesManager::AbilitiesManager()
 {
+    this->flags = new Flags();
     std::vector<Iability*> temp_vector = {new Scanner, new Double_damage, new Shelling};
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -12,13 +13,13 @@ AbilitiesManager::AbilitiesManager()
     abilities = temp_vector;
 }
 
-void AbilitiesManager::use_ability(Field* field, Flags* flags)
+void AbilitiesManager::use_ability(Field* field)
 {
     if (!abilities.size())
     {
         throw(AbilityUseInEmptyManger(this));
     }else{
-        abilities[0]->use_skill(field, flags);
+        abilities[0]->use_skill(field, this->flags);
         abilities.erase(abilities.begin());
     }
 }
