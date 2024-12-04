@@ -5,6 +5,8 @@
 
 Ship::Segment::Segment(){ this->condition = Condition::undamaged;}
 
+Ship::Segment::Segment(Condition condition){ this->condition = condition;}
+
 void Ship::Segment::attack()
 {
     switch (this->condition)
@@ -31,7 +33,6 @@ void Ship::Segment::set_condition(Condition condition){this->condition = conditi
 
 Ship::Ship(int lenght, Orientation orientation):lenght(lenght)
 {
-    
     if (this->lenght > MAX_SHIP_LENGHT || this->lenght < MIN_SHIP_LENGHT)
     {
         std::cerr << "Incorrect ship lenght" << std::endl;
@@ -50,6 +51,29 @@ Ship::Ship(int lenght, Orientation orientation):lenght(lenght)
         break;
     }
     for(size_t segment_iterator=0; segment_iterator<this->lenght; segment_iterator++) segments.push_back(new Segment());
+}
+
+Ship::Ship(int lenght, Orientation orientation, std::vector<Condition> segment_conditions)
+{
+    if (this->lenght > MAX_SHIP_LENGHT || this->lenght < MIN_SHIP_LENGHT)
+    {
+        std::cerr << "Incorrect ship lenght" << std::endl;
+        exit(1);
+    } 
+    switch (orientation)
+    {
+    case Orientation::vertical:
+        this->orientation = Orientation::vertical;
+        break;
+    case Orientation::horisontal:
+        this->orientation = Orientation::horisontal;
+        break;
+    default:
+        std::cout << "Deffalut in Ship::Constructor" << std::endl;
+        break;
+    }
+    for(size_t segment_iterator=0; segment_iterator<this->lenght; segment_iterator++)
+        segments.push_back(new Segment(segment_conditions[segment_iterator]));
 }
 
 Ship::Ship(const Ship& ship):lenght(ship.lenght),orientation(ship.orientation)

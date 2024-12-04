@@ -13,6 +13,17 @@ ShipManager::ShipManager(int num_of_ships, std::vector<int> lenghts, std::vector
     }
 }
 
+ShipManager::ShipManager(int num_of_ships, std::vector<int> lenghts, 
+std::vector<Orientation> orientations, std::vector<std::vector<Condition>> ship_conditions
+):num_of_ships(num_of_ships)
+{
+    for(size_t lenght_iterator=0; lenght_iterator<num_of_ships; lenght_iterator++)
+    {
+        ships.push_back(new Ship(lenghts[lenght_iterator], 
+        orientations[lenght_iterator], ship_conditions[lenght_iterator]));
+    }
+}
+
 ShipManager::~ShipManager()
 {
     for(size_t length_iterator=0; length_iterator< num_of_ships; length_iterator++)

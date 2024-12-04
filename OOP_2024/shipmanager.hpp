@@ -13,6 +13,9 @@ private:
 public:
     ShipManager(int num_of_ships, std::vector<int> lenghts, std::vector<Orientation> orientations);
 
+    ShipManager(int num_of_ships, std::vector<int> lenghts, 
+    std::vector<Orientation> orientations, std::vector<std::vector<Condition>> ship_conditions);
+
     ~ShipManager();
 
     Ship* get_ship(int ind);

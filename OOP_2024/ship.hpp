@@ -16,6 +16,8 @@ private:
         Condition condition;
     public:
 
+        Segment(Condition condition);
+
         Segment();
 
         void attack();
@@ -33,6 +35,8 @@ private:
 public:
 
     Ship(int lenght, Orientation orientation);
+
+    Ship(int lenght, Orientation orientation, std::vector<Condition> segment_conditions);
 
     Ship(const Ship& ship);
 
