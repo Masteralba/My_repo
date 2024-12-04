@@ -100,6 +100,12 @@ Orientation Ship::get_orientation(){return this->orientation;}
 
 int Ship::get_lenght(){return this->lenght;}
 
+std::vector<Condition> Ship::get_conditions()
+{
+    std::vector<Condition> ship_conditions;
+    for (auto segment: this->segments) ship_conditions.push_back(segment->get_condition());
+}
+
 void Ship::attack_segment(int ind)
 {
     if ( ind >= MAX_SHIP_LENGHT || ind < MIN_SHIP_LENGHT-1)

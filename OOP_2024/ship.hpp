@@ -50,6 +50,8 @@ public:
 
     int get_lenght();
 
+    std::vector<Condition> get_conditions();
+
     void attack_segment(int ind);
 
     void destroy_segment(int ind);
