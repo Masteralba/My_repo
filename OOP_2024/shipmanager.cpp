@@ -44,18 +44,21 @@ std::vector<int> ShipManager::get_ships_lenghts()
 {
     std::vector<int> ships_lenghts = {};
     for (auto ship: this->ships) ships_lenghts.push_back(ship->get_lenght());
+    return ships_lenghts;
 }
 
 std::vector<Orientation> ShipManager::get_ships_orientations()
 {
     std::vector<Orientation> ships_orientations = {};
     for (auto ship: this->ships) ships_orientations.push_back(ship->get_orientation());
+    return ships_orientations;
 }
 
 std::vector<std::vector<Condition>> ShipManager::get_ships_conditions()
 {
     std::vector<std::vector<Condition>> ships_conditions = {};
     for (auto ship: this->ships) ships_conditions.push_back(ship->get_conditions());
+    return ships_conditions;
 }    
     
 void ShipManager::show_info() 

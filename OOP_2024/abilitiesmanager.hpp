@@ -16,6 +16,8 @@ class AbilitiesManager
 
     AbilitiesManager();
 
+    int size(){return abilities.size();}
+
     void use_ability(Field* field, Flags* flags);
 
     void add_ability();

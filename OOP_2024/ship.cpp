@@ -54,6 +54,7 @@ Ship::Ship(int lenght, Orientation orientation):lenght(lenght)
 }
 
 Ship::Ship(int lenght, Orientation orientation, std::vector<Condition> segment_conditions)
+:lenght(lenght)
 {
     if (this->lenght > MAX_SHIP_LENGHT || this->lenght < MIN_SHIP_LENGHT)
     {
@@ -104,6 +105,7 @@ std::vector<Condition> Ship::get_conditions()
 {
     std::vector<Condition> ship_conditions;
     for (auto segment: this->segments) ship_conditions.push_back(segment->get_condition());
+    return ship_conditions;
 }
 
 void Ship::attack_segment(int ind)

@@ -1,7 +1,7 @@
 all: game
 
-game: main.o field.o ship.o shipmanager.o abilities.o abilitiesmanager.o myexception.o game.o
-	g++ -g main.o field.o ship.o shipmanager.o abilities.o abilitiesmanager.o myexception.o game.o -o game
+game: main.o field.o ship.o shipmanager.o abilities.o abilitiesmanager.o myexception.o game.o gamestate.o
+	g++ -g main.o field.o ship.o shipmanager.o abilities.o abilitiesmanager.o myexception.o game.o gamestate.o -o game
 
 main.o: main.cpp
 	g++ -c -g main.cpp -o main.o
@@ -26,6 +26,9 @@ myexception.o: myexception.cpp myexception.hpp
 
 game.o: game.cpp game.hpp
 	g++ -c -g game.cpp -o game.o
+
+gamestate.o: gamestate.cpp gamestate.hpp
+	g++ -c -g gamestate.cpp -o gamestate.o
 
 make clean:
 	rm *.o game
