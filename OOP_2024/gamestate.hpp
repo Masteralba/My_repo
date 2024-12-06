@@ -7,28 +7,17 @@
 #include "myexception.hpp"
 #include "flags.hpp"
 
-
 class GameState
 {
     public:
 
-    GameState(int width, int height, int ship_number, std::vector<int> lenghts,
-    std::vector<Orientation> orientations, 
+    GameState(int width, int height, int player_ship_number, int enemy_ship_number, 
+    std::vector<int> player_ships_lenghts,
+    std::vector<int> enemy_ships_lenghts,
+    std::vector<Orientation> player_ships_orientations,
+    std::vector<Orientation> enemy_ships_orientations, 
     std::vector<std::vector<int>> player_ships_coordinates, 
-    std::vector<std::vector<int>> enemy_ships_coordinates,
-    std::vector<std::vector<Condition>> ship_conditions);
-
-    GameState():
-    width(0), height(0), ship_number(0),
-    lenghts({}), orientations({}), player_ships_coordinates({}), 
-    enemy_ships_coordinates({}),ship_conditions({}){}
-
-
-    int width, height, ship_number;
-    std::vector<int> lenghts;
-    std::vector<Orientation> orientations;
-    std::vector<std::vector<Condition>> ship_conditions;
-
+    std::vector<std::vector<int>> enemy_ships_coordinates);
     
     Field* player_field;
     Field* enemy_field;
@@ -41,8 +30,10 @@ class GameState
 
     std::string get_data_for_output() const;
 
-    void get_data_from_input(std::string field_data, std::string player_data, std::string enemy_data);
+    void get_data_from_input(std::string hash, std::string field_data, std::string player_data, std::string enemy_data);
+
+    void save();
+
+    void load();
 
 };
-
-

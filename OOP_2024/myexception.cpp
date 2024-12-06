@@ -50,3 +50,10 @@ std::string IncorrectShipPlace::what()
     + " in the cell(" + std::to_string(coord_x) + "," + std::to_string(coord_y) + ")\n";
     return msg;
 }
+
+
+std::string FileWasChanged::what()
+{
+    std::string msg = "File" + this->filename + " was changed. Loading from file is impossible";
+    return msg;
+}

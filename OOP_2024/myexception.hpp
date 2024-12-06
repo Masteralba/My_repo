@@ -70,3 +70,14 @@ class IncorrectShipPlace : ShipExceptions
     std::string  what();
 };
 
+class FileWasChanged
+{
+    public:
+
+    std::string filename;
+
+    FileWasChanged(std::string filename):filename(filename){};
+
+    std::string what();
+};
+

@@ -14,25 +14,26 @@ class Game
 
     Game(GameState* gamestate):gamestate(gamestate){}
 
-    void attack_enemy_field(int x_coord, int y_coord);
-
-    void attack_player_field();
-
-    void use_ability();
-
     void main();
 
     void player_start();
 
     void enemy_start();
 
+    void round(int coord_x, int coord_y, bool ability_flag=false);
+
+    GameState* gamestate;
+
+    private:
+    
     void player_tern(int coord_x, int coord_y, bool ability_flag=false);
 
     void enemy_tern();
 
-    void round(int coord_x, int coord_y, bool ability_flag=false);
+    void attack_enemy_field(int x_coord, int y_coord);
 
-    private:
+    void attack_player_field();
+
+    void use_ability();
     
-    GameState* gamestate;
 };

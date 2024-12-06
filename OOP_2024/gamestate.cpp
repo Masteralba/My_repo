@@ -1,33 +1,39 @@
 #include <iostream>
 #include <string>
 #include <bits/stdc++.h>
+#include <unordered_map>
+#include "myexception.hpp"
 #include "gamestate.hpp"
 
-GameState::GameState
-(int width, int height, int ship_number, 
-std::vector<int> lenghts, std::vector<Orientation> orientations, 
-std::vector<std::vector<int>> player_ships_coordinates,
-std::vector<std::vector<int>> enemy_ships_coordinates, 
-std::vector<std::vector<Condition>> ship_conditions)
-:width(width), height(height), ship_number(ship_number),
-lenghts(lenghts), orientations(orientations),
-player_ships_coordinates(player_ships_coordinates), enemy_ships_coordinates(enemy_ships_coordinates), 
-ship_conditions(ship_conditions)
+GameState::GameState // для инициализации из ввода
+    (int width, int height, int player_ship_number, int enemy_ship_number, 
+    std::vector<int> player_ships_lenghts,
+    std::vector<int> enemy_ships_lenghts,
+    std::vector<Orientation> player_ships_orientations,
+    std::vector<Orientation> enemy_ships_orientations, 
+    std::vector<std::vector<int>> player_ships_coordinates, 
+    std::vector<std::vector<int>> enemy_ships_coordinates)
+    :player_ships_coordinates(player_ships_coordinates),
+    enemy_ships_coordinates(enemy_ships_coordinates)
 {
     this->player_field = new Field(width, height);
-    this->player_shipmanager = new ShipManager(ship_number, lenghts, orientations, ship_conditions);
+    this->player_shipmanager = new ShipManager(player_ship_number, player_ships_lenghts,
+    player_ships_orientations);
     this->abilitiesmanager = new AbilitiesManager();
     this->enemy_field = new Field(width, height);
-    this->enemy_shipmanager = new ShipManager(ship_number, lenghts, orientations, ship_conditions);
+    this->enemy_shipmanager = new ShipManager(enemy_ship_number, enemy_ships_lenghts, 
+    enemy_ships_orientations);
+    this->flags = new Flags();
  }
 
 
 std::string GameState::get_data_for_output() const
 {
-    std::string player_data, enemy_data, field_data;
+    std::string player_data, enemy_data, field_data, hash;
 
     field_data = std::to_string(this->player_field->get_width()) + 
     "|" + std::to_string(this->player_field->get_height());
+
     player_data = std::to_string(this->player_shipmanager->get_ships_number());
     for (auto elem: this->player_shipmanager->get_ships_lenghts()) player_data += "|" + std::to_string(elem);
     for(size_t i=0; i<this->player_shipmanager->get_ships_number(); i++)
@@ -42,6 +48,7 @@ std::string GameState::get_data_for_output() const
         for (auto condition: elem) player_data += std::to_string(static_cast<int>(condition));
     }
     player_data += "|" + std::to_string(this->abilitiesmanager->size());
+    player_data += "|" + std::to_string(static_cast<int>(this->flags->double_damage));
 
     enemy_data = std::to_string(this->enemy_shipmanager->get_ships_number());
     for (auto elem: this->enemy_shipmanager->get_ships_lenghts()) enemy_data += "|" + std::to_string(elem);
@@ -55,20 +62,34 @@ std::string GameState::get_data_for_output() const
     {
         enemy_data += "|";
         for (auto condition: elem) enemy_data += std::to_string(static_cast<int>(condition));
-    } 
+    }
 
-    return field_data + "\n" + player_data + "\n" + enemy_data;
+    hash = std::to_string(std::hash<std::string>{}(field_data + "\n" + player_data + "\n" + enemy_data));
+
+    return hash + "\n" + field_data + "\n" + player_data + "\n" + enemy_data;
 }
 
-void GameState::get_data_from_input(std::string field_data, std::string player_data, std::string enemy_data)
+void GameState::get_data_from_input(std::string hash, std::string field_data, std::string player_data, std::string enemy_data)
 {
-    int width, height, ship_number;
+    long int needed_hash = std::stol(hash);
+
+    long int hash_from_file = std::hash<std::string>{}(field_data + "\n" + player_data + "\n" + enemy_data);
+
+    if (needed_hash != hash_from_file)
+    {
+        std::cout << "File is damaged" << std::endl; // add exeption
+        return;
+    }
+
+
+    int width, height, player_ship_number, enemy_ship_number;
 
     std::vector<int> player_ships_lenghts;
     std::vector<Orientation> player_ships_orientations;
     std::vector<std::vector<int>> player_ships_coordinates;
     std::vector<std::vector<Condition>> player_ships_conditions;
     int abilities_manager_size;
+    bool double_damage_flag;
 
     std::vector<int> enemy_ships_lenghts;
     std::vector<Orientation> enemy_ships_orientations;
@@ -86,17 +107,17 @@ void GameState::get_data_from_input(std::string field_data, std::string player_d
     {
         player_elem_counter++;
         getline(stream_player_data, elem_from_player_data, '|');
-        if (player_elem_counter == 0) ship_number = std::stoi(elem_from_player_data);
-        if (player_elem_counter > ship_number*0 && player_elem_counter <= ship_number*1) 
+        if (player_elem_counter == 0) player_ship_number = std::stoi(elem_from_player_data);
+        if (player_elem_counter > player_ship_number*0 && player_elem_counter <= player_ship_number*1) 
             player_ships_lenghts.push_back(std::stoi(elem_from_player_data));
-        if (player_elem_counter > ship_number*1 && player_elem_counter <= ship_number*2) 
+        if (player_elem_counter > player_ship_number*1 && player_elem_counter <= player_ship_number*2) 
             player_ships_orientations.push_back(
                 elem_from_player_data == "h" ? Orientation::horisontal : Orientation::vertical);
-        if (player_elem_counter > ship_number*2 && player_elem_counter <= ship_number*3) 
+        if (player_elem_counter > player_ship_number*2 && player_elem_counter <= player_ship_number*3) 
             player_ships_coordinates.push_back(
                 {std::stoi(elem_from_player_data.substr(0, elem_from_player_data.find(','))),
                  std::stoi(elem_from_player_data.substr(elem_from_player_data.find(',')+1))});
-        if (player_elem_counter > ship_number*3 && player_elem_counter <= ship_number*4)
+        if (player_elem_counter > player_ship_number*3 && player_elem_counter <= player_ship_number*4)
             {
                 std::vector<Condition> temp_conditions;
                 for (auto condition: elem_from_player_data)
@@ -105,8 +126,10 @@ void GameState::get_data_from_input(std::string field_data, std::string player_d
                     Condition::damaged : Condition::destroyed);
                 player_ships_conditions.push_back(temp_conditions);
             }
-        if (player_elem_counter == ship_number*4 + 1)
-            abilities_manager_size = std::stoi(elem_from_player_data);    
+        if (player_elem_counter == player_ship_number*4 + 1)
+            abilities_manager_size = std::stoi(elem_from_player_data);
+        if (player_elem_counter == player_ship_number*4+ 2)
+            double_damage_flag = static_cast<bool>(std::stoi(elem_from_player_data));
     }
 
     std::stringstream stream_enemy_data(enemy_data);
@@ -116,17 +139,17 @@ void GameState::get_data_from_input(std::string field_data, std::string player_d
     {
         enemy_elem_counter++;
         getline(stream_enemy_data, elem_from_enemy_data, '|');
-        if (enemy_elem_counter == 0) ship_number = std::stoi(elem_from_enemy_data);
-        if (enemy_elem_counter > ship_number*0 && enemy_elem_counter <= ship_number*1) 
+        if (enemy_elem_counter == 0) enemy_ship_number = std::stoi(elem_from_enemy_data);
+        if (enemy_elem_counter > enemy_ship_number*0 && enemy_elem_counter <= enemy_ship_number*1) 
             enemy_ships_lenghts.push_back(std::stoi(elem_from_enemy_data));
-        if (enemy_elem_counter > ship_number*1 && enemy_elem_counter <= ship_number*2) 
+        if (enemy_elem_counter > enemy_ship_number*1 && enemy_elem_counter <= enemy_ship_number*2) 
             enemy_ships_orientations.push_back(
                 elem_from_enemy_data == "h" ? Orientation::horisontal : Orientation::vertical);
-        if (enemy_elem_counter > ship_number*2 && enemy_elem_counter <= ship_number*3) 
+        if (enemy_elem_counter > enemy_ship_number*2 && enemy_elem_counter <= enemy_ship_number*3) 
             enemy_ships_coordinates.push_back(
                 {std::stoi(elem_from_enemy_data.substr(0, elem_from_enemy_data.find(','))),
                  std::stoi(elem_from_enemy_data.substr(elem_from_enemy_data.find(',')+1))});
-        if (enemy_elem_counter > ship_number*3 && enemy_elem_counter <= ship_number*4)
+        if (enemy_elem_counter > enemy_ship_number*3 && enemy_elem_counter <= enemy_ship_number*4)
             {
                 std::vector<Condition> temp_conditions;
                 for (auto condition: elem_from_enemy_data)
@@ -137,6 +160,54 @@ void GameState::get_data_from_input(std::string field_data, std::string player_d
             }   
     }
 
+    this->player_field = new Field(width, height);
+    this->player_shipmanager = new ShipManager(enemy_ship_number, player_ships_lenghts,
+    player_ships_orientations, player_ships_conditions);
+    this->abilitiesmanager = new AbilitiesManager();
+    this->enemy_field = new Field(width, height);
+    this->enemy_shipmanager = new ShipManager(enemy_ship_number, enemy_ships_lenghts, 
+    enemy_ships_orientations, enemy_ships_conditions);
+    this->flags = new Flags();
+    if (double_damage_flag) this->flags->double_damage = true;
+    if (abilities_manager_size < 3) while (this->abilitiesmanager->size() != abilities_manager_size) this->abilitiesmanager->pop();
+    if (abilities_manager_size > 3) while (this->abilitiesmanager->size() != abilities_manager_size) this->abilitiesmanager->add_ability();
+
 }
 
+std::ostream& operator << (std::ostream &os, const GameState &gamestate)
+{
+    return os << gamestate.get_data_for_output();
+}
 
+std::istream& operator >> (std::istream& in, GameState &gamestate)
+{
+    std::string field_data, player_data, enemy_data, hash;
+    std::getline(in, hash);
+    std::getline(in, field_data);
+    std::getline(in, player_data);
+    std::getline(in, enemy_data);
+    gamestate.get_data_from_input(hash, field_data, player_data, enemy_data);
+    return in;
+}
+
+void GameState::save()
+{
+    //file prcessing
+    std::ofstream out("save.txt");
+    if (out.is_open())
+    {
+        out << *this << std::endl;
+    }
+    out.close();
+}
+
+void GameState::load()
+{
+    std::ifstream in("save.txt"); // окрываем файл для чтения
+    if (in.is_open())
+    {
+        in >> *this;
+    }
+
+    in.close();
+}

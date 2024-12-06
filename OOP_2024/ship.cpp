@@ -35,7 +35,7 @@ Ship::Ship(int lenght, Orientation orientation):lenght(lenght)
 {
     if (this->lenght > MAX_SHIP_LENGHT || this->lenght < MIN_SHIP_LENGHT)
     {
-        std::cerr << "Incorrect ship lenght" << std::endl;
+        std::cerr << "Incorrect ship lenght" << lenght << std::endl;
         exit(1);
     } 
     switch (orientation)

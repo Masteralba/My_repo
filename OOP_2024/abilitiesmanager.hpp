@@ -24,4 +24,6 @@ class AbilitiesManager
 
     void print_abilityes();
 
+    void pop(){if (!this->abilities.empty()) this->abilities.pop_back();}
+
 };
