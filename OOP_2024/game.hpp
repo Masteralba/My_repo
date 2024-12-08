@@ -14,13 +14,15 @@ class Game
 
     Game(GameState* gamestate):gamestate(gamestate){}
 
-    void main();
+    GameState* get_gamestate(){return this->gamestate;}
 
     void player_start();
 
     void enemy_start();
 
     void round(int coord_x, int coord_y, bool ability_flag=false);
+
+    void check_win();
 
     GameState* gamestate;
 

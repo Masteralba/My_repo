@@ -25,8 +25,7 @@ int main()
     Game* game = new Game(gamestate);
     game->player_start();
     game->enemy_start();
-    game->main();
-    
+    game->check_win();    
     
     return 0;
 }

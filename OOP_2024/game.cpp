@@ -2,6 +2,7 @@
 #include <random>
 #include <algorithm>
 #include "game.hpp"
+#include "fileprocessor.hpp"
 
 
 void Game::attack_enemy_field(int x_coord, int y_coord)
@@ -81,7 +82,6 @@ void Game::enemy_start()
 void Game::player_tern(int coord_x, int coord_y, bool ability_flag)
 {
     // тут есть возможность загрузить сохранение или сохраниться
-    //this->gamestate->save() this->gamestate->load()
     this->attack_enemy_field(coord_x, coord_y);
     if (ability_flag){
         this->use_ability();
@@ -97,28 +97,14 @@ void Game::round(int coord_x, int coord_y, bool ability_flag)
     this->enemy_tern();
 }
 
-void Game::main()
+void Game::check_win()
 {
-    while(!this->gamestate->player_shipmanager->all_ships_destroyed() && 
-    !this->gamestate->enemy_shipmanager->all_ships_destroyed())
-    {
-        // вызов высшей сущности, получение координат для атаки, и способностей
-        int coord_x, coord_y, ability_flag;
-        std::cout << "put coords and ability flag" << std::endl;
-        std::cin >> coord_x >> coord_y >> ability_flag;
-        this->round(coord_x, coord_y, ability_flag);
-        this->gamestate->player_field->print();
-        std::cout << std::endl;
-        this->gamestate->enemy_field->print();
-    }
-
     if (this->gamestate->enemy_shipmanager->all_ships_destroyed()) // Проиграл противник
     {
         this->gamestate->enemy_field = new Field(this->gamestate->enemy_field->get_width(), this->gamestate->enemy_field->get_height() );
         this->gamestate->enemy_shipmanager = new ShipManager(this->gamestate->enemy_shipmanager->get_ships_number(), this->gamestate->enemy_shipmanager->get_ships_lenghts(),
         this->gamestate->enemy_shipmanager->get_ships_orientations());
         this->enemy_start();
-        this->main();
     }
     else  // проиграл игрок
     {
@@ -128,6 +114,5 @@ void Game::main()
         this->gamestate->abilitiesmanager = new AbilitiesManager();
         this->gamestate->flags = new Flags();
         this->player_start();
-        this->main();
     }
 }

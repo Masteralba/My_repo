@@ -32,8 +32,9 @@ class GameState
 
     void get_data_from_input(std::string hash, std::string field_data, std::string player_data, std::string enemy_data);
 
-    void save();
-
-    void load();
-
 };
+
+
+std::ostream& operator << (std::ostream &os, const GameState &gamestate);
+
+std::istream& operator >> (std::istream& in, GameState &gamestate);

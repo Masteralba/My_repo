@@ -189,25 +189,3 @@ std::istream& operator >> (std::istream& in, GameState &gamestate)
     gamestate.get_data_from_input(hash, field_data, player_data, enemy_data);
     return in;
 }
-
-void GameState::save()
-{
-    //file prcessing
-    std::ofstream out("save.txt");
-    if (out.is_open())
-    {
-        out << *this << std::endl;
-    }
-    out.close();
-}
-
-void GameState::load()
-{
-    std::ifstream in("save.txt"); // окрываем файл для чтения
-    if (in.is_open())
-    {
-        in >> *this;
-    }
-
-    in.close();
-}

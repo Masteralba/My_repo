@@ -196,7 +196,6 @@ void Field::attack_cell(int coord_x, int coord_y, bool double_attack)
         break;
     }
     case CellStatus::empty:
-        std::cout << "The empty cell was attacked" << std::endl;
         break;
     case CellStatus::unknown:
         if ( attacking_cell->get_ship() != nullptr)
