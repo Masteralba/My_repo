@@ -2,24 +2,25 @@
 #include <fstream>
 #include "fileprocessor.hpp"
 
-void FileProcessor::save_gamestate(GameState* gamestate, const char* filename)
+FileProcessor::FileProcessor(std::ios::openmode mode, const std::string& filename)
+    :file(filename, mode), filename(filename)
 {
-    //file prcessing
-    std::ofstream out(filename);
-    if (out.is_open())
-    {
-        out << *gamestate << std::endl;
-    }
-    out.close();
+    if (!file.is_open()){throw std::runtime_error ("Failed to open file: " + filename);}
 }
 
-void FileProcessor::load_gamestate(GameState* gamestate, const char* filename)
+void FileProcessor::save_gamestate(GameState* gamestate)
 {
-    std::ifstream in(filename); // окрываем файл для чтения
-    if (in.is_open())
-    {
-        in >> *gamestate;
-    }
+    file << (*gamestate);
+}
 
-    in.close();
+void FileProcessor::load_gamestate(GameState* gamestate)
+{
+    try{
+        file >> (*gamestate);
+    }catch(FileWasChanged& e) {throw FileWasChanged(this->get_filename());}
+}
+
+FileProcessor::~FileProcessor()
+{
+    if (file.is_open()) file.close();
 }

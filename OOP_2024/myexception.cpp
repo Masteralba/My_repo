@@ -54,6 +54,6 @@ std::string IncorrectShipPlace::what()
 
 std::string FileWasChanged::what()
 {
-    std::string msg = "File" + this->filename + " was changed. Loading from file is impossible";
+    std::string msg = "File was changed. Loading from file is impossible";
     return msg;
 }

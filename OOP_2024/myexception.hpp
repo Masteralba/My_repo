@@ -74,10 +74,12 @@ class FileWasChanged
 {
     public:
 
-    std::string filename;
-
-    FileWasChanged(std::string filename):filename(filename){};
+    FileWasChanged(std::string filename):filename(filename){}
 
     std::string what();
+
+    private:
+
+    std::string filename = "";
 };
 

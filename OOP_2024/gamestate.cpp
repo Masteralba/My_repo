@@ -75,11 +75,7 @@ void GameState::get_data_from_input(std::string hash, std::string field_data, st
 
     long int hash_from_file = std::hash<std::string>{}(field_data + "\n" + player_data + "\n" + enemy_data);
 
-    if (needed_hash != hash_from_file)
-    {
-        std::cout << "File is damaged" << std::endl; // add exeption
-        return;
-    }
+    if (needed_hash != hash_from_file) throw FileWasChanged("");
 
 
     int width, height, player_ship_number, enemy_ship_number;
@@ -186,6 +182,8 @@ std::istream& operator >> (std::istream& in, GameState &gamestate)
     std::getline(in, field_data);
     std::getline(in, player_data);
     std::getline(in, enemy_data);
-    gamestate.get_data_from_input(hash, field_data, player_data, enemy_data);
+    try{
+        gamestate.get_data_from_input(hash, field_data, player_data, enemy_data);
+    } catch (FileWasChanged& e) {throw e;}
     return in;
 }

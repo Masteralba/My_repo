@@ -24,6 +24,10 @@ class Game
 
     void check_win();
 
+    void save(const char* filename);
+
+    void load(const char* filename);
+
     GameState* gamestate;
 
     private:
