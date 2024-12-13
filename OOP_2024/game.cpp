@@ -5,7 +5,7 @@
 #include "fileprocessor.hpp"
 
 
-void Game::attack_enemy_field(int x_coord, int y_coord)
+void Game::player_attack(int x_coord, int y_coord) // атака пользователя
 {
     int destroyed_number_before = this->get_gamestate()->enemy_shipmanager->destroyed_number();
     try{
@@ -20,7 +20,7 @@ void Game::attack_enemy_field(int x_coord, int y_coord)
     if ( destroyed_nuber_after > destroyed_number_before) this->get_gamestate()->abilitiesmanager->add_ability();
 }
 
-void Game::attack_player_field()
+void Game::enemy_attack() // атака противника (рандом)
 {
     srand((unsigned)time(0)); 
     int coord_x, coord_y;
@@ -32,7 +32,7 @@ void Game::attack_player_field()
     }catch(AttackOutOfBounds& e){}
 }
 
-void Game::use_ability()
+void Game::use_ability() // Ипользование способности
 {
     int destroyed_number_before = this->get_gamestate()->enemy_shipmanager->destroyed_number();
     try{
@@ -46,7 +46,7 @@ void Game::use_ability()
     if ( destroyed_nuber_after > destroyed_number_before) this->get_gamestate()->abilitiesmanager->add_ability();
 }
 
-void Game::player_start()
+void Game::arrange_player_ships() // Расставить корабли пользователя (внутренняя функция)
 {
     for (size_t lenght_iterator=0; lenght_iterator<this->get_gamestate()->player_ships_coordinates.size(); lenght_iterator++)
     {
@@ -65,7 +65,7 @@ void Game::player_start()
     }
 }
 
-void Game::enemy_start()
+void Game::ararnge_enemy_ships() // Расставить корабли противника (внутренняя функция)
 {
     for (size_t lenght_iterator=0; lenght_iterator<this->get_gamestate()->enemy_ships_coordinates.size(); lenght_iterator++)
     {
@@ -79,45 +79,7 @@ void Game::enemy_start()
     }
 }
 
-void Game::player_tern(int coord_x, int coord_y, bool ability_flag)
-{
-    this->attack_enemy_field(coord_x, coord_y);
-    if (ability_flag){
-        this->use_ability();
-        ability_flag = false;
-    }
-}
-
-void Game::enemy_tern(){this->attack_player_field();}
-
-void Game::round(int coord_x, int coord_y, bool ability_flag)
-{
-    this->player_tern(coord_x, coord_y, ability_flag);
-    this->enemy_tern();
-}
-
-void Game::check_win()
-{
-    if (this->get_gamestate()->enemy_shipmanager->all_ships_destroyed()) // Проиграл противник
-    {
-        this->get_gamestate()->enemy_field = new Field(this->get_gamestate()->enemy_field->get_width(), this->get_gamestate()->enemy_field->get_height() );
-        this->get_gamestate()->enemy_shipmanager = new ShipManager(this->get_gamestate()->enemy_shipmanager->get_ships_number(), this->get_gamestate()->enemy_shipmanager->get_ships_lenghts(),
-        this->get_gamestate()->enemy_shipmanager->get_ships_orientations());
-        this->enemy_start();
-    }
-    else  // проиграл игрок
-    {
-        this->get_gamestate()->player_field = new Field(this->get_gamestate()->player_field->get_width(), this->get_gamestate()->player_field->get_height() );
-        this->get_gamestate()->player_shipmanager = new ShipManager(this->get_gamestate()->player_shipmanager->get_ships_number(), this->get_gamestate()->player_shipmanager->get_ships_lenghts(),
-        this->get_gamestate()->player_shipmanager->get_ships_orientations());
-        this->get_gamestate()->abilitiesmanager = new AbilitiesManager();
-        this->get_gamestate()->flags = new Flags();
-        this->player_start();
-    }
-}
-
-
-void Game::save(const char* filename)
+void Game::save_to_file(const char* filename) // Сохраниться в файл
 {
     try{
     FileProcessor* fileprocessor = new FileProcessor(std::ios::out, filename);
@@ -129,18 +91,43 @@ void Game::save(const char* filename)
     }   
 }
 
-void Game::load(const char* filename)
+void Game::load_from_file(const char* filename) // Загрузиться из файла
 {   
     try{
     FileProcessor* fileprocessor = new FileProcessor(std::ios::in, filename);
-    fileprocessor->save_gamestate(this->get_gamestate());
-    } catch (std::runtime_error e)
+    fileprocessor->load_gamestate(this->get_gamestate());
+    this->arrange_player_ships();
+    this->ararnge_enemy_ships();
+    } catch (std::runtime_error& e){throw e;} 
+    catch (FileWasChanged& e){throw e;}
+}
+
+void Game::load_from_input(int width, int height, int player_ship_number, // Загрузиться из ввода
+    std::vector<int> player_ships_lenghts,
+    std::vector<Orientation> player_ships_orientations,
+    std::vector<std::vector<int>> player_ships_coordinates)
+{
+    this->get_gamestate()->player_ships_coordinates = player_ships_coordinates;
+    this->get_gamestate()->player_field = new Field(width, height);
+    this->get_gamestate()->player_shipmanager = new ShipManager(player_ship_number, player_ships_lenghts, player_ships_orientations);
+    this->arrange_player_ships();
+
+    // add random to enemy
+    
+    std::vector<std::vector<int>> enemy_ships_coordinates;
+    std::vector<int> enemy_ships_lenghts;
+    std::vector<Orientation> enemy_ships_orientations;
+    for(size_t i=0;i<player_ship_number;i++)
     {
-        std::cout << e.what() << std::endl;
-        return;
-    } catch (FileWasChanged& e)
-    {
-        std::cout << e.what() << std::endl;
-        return;
+        srand((unsigned)time(0)); 
+        enemy_ships_lenghts.push_back(rand()%MAX_SHIP_LENGHT+1);
+        enemy_ships_orientations.push_back(rand()%2 == 0 ? Orientation::horisontal : Orientation::vertical);
+        enemy_ships_coordinates.push_back({rand()%width, rand()%height});
     }
+
+    this->get_gamestate()->enemy_ships_coordinates = enemy_ships_coordinates;
+    this->get_gamestate()->enemy_field = new Field(width, height);
+    this->get_gamestate()->enemy_shipmanager = new ShipManager(player_ship_number, enemy_ships_lenghts, enemy_ships_orientations);
+    this->ararnge_enemy_ships();
+
 }

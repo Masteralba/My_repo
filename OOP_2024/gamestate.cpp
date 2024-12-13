@@ -5,6 +5,18 @@
 #include "myexception.hpp"
 #include "gamestate.hpp"
 
+
+GameState::GameState()
+{
+    this->player_field = new Field(0, 0);
+    this->player_shipmanager = new ShipManager(0, {},{});
+    this->abilitiesmanager = new AbilitiesManager();
+    this->enemy_field = new Field(0, 0);
+    this->enemy_shipmanager = new ShipManager(0, {}, {});
+    this->flags = new Flags();
+}
+
+
 GameState::GameState // для инициализации из ввода
     (int width, int height, int player_ship_number, int enemy_ship_number, 
     std::vector<int> player_ships_lenghts,
@@ -163,6 +175,8 @@ void GameState::get_data_from_input(std::string hash, std::string field_data, st
     this->enemy_field = new Field(width, height);
     this->enemy_shipmanager = new ShipManager(enemy_ship_number, enemy_ships_lenghts, 
     enemy_ships_orientations, enemy_ships_conditions);
+    this->player_ships_coordinates = player_ships_coordinates;
+    this->enemy_ships_coordinates = enemy_ships_coordinates;
     this->flags = new Flags();
     if (double_damage_flag) this->flags->double_damage = true;
     if (abilities_manager_size < 3) while (this->abilitiesmanager->size() != abilities_manager_size) this->abilitiesmanager->pop();

@@ -57,3 +57,40 @@ std::string FileWasChanged::what()
     std::string msg = "File was changed. Loading from file is impossible";
     return msg;
 }
+
+std::string ImproperCooordsInput::what()
+{
+    std::string msg = "Improper coords: " + std::to_string(this->x) + std::to_string(this->y) + '\n';
+    return msg;
+}
+
+std::string ImproperCommandInput::what()
+{
+    std::string msg = "Cant find command: " + this->input + '\n';
+    return msg;
+}
+
+std::string ImproperLenghtsInput::what()
+{
+    std::string msg = "Improper lenght: ?" + this->lenght + '\n';
+    return msg;
+}
+
+std::string ImproperWidthAndHeightInput::what()
+{
+    std::string msg = "Improper width: " + std::to_string(this->width) + "and height: " + std::to_string(this->height) + '\n';
+    return msg;
+}
+
+std::string ImproperShipsNumberInput::what()
+{
+    std::string msg = "Improper ship number: " + std::to_string(this->num) + '\n';
+    return msg;
+}
+
+std::string ImproperOrieantationsInput::what()
+{
+    std::string msg = "Improper orientations input: " + std::to_string(this->input) + '\n';
+    return msg;
+}
+

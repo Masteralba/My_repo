@@ -11,6 +11,8 @@ class GameState
 {
     public:
 
+    GameState();
+
     GameState(int width, int height, int player_ship_number, int enemy_ship_number, 
     std::vector<int> player_ships_lenghts,
     std::vector<int> enemy_ships_lenghts,
