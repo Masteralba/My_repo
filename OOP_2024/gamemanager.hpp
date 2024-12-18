@@ -2,8 +2,9 @@
 #include "game.hpp"
 #include "parser.hpp"
 #include "input.hpp"
+#include "display.hpp"
 
-
+template <typename T, typename G>
 class GameManager
 {
     public:
@@ -14,15 +15,13 @@ class GameManager
 
     void use_command();
 
-    void start();
-
-    void main();
-
     Game* game;
 
-    Parser* parser;
+    T* parser;
 
     Input* input;
+
+    Display<G>* display;
 
     private:
 

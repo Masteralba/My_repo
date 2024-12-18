@@ -20,4 +20,6 @@ class Input
     std::vector<Orientation> get_ships_orientations(int ships_number);
 
     std::vector<std::vector<int>> get_coordinates(int ships_number);
+
+    const char* get_filename();
 };

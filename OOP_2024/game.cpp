@@ -113,13 +113,12 @@ void Game::load_from_input(int width, int height, int player_ship_number, // Ð—Ð
     this->arrange_player_ships();
 
     // add random to enemy
-    
+    srand((unsigned)time(0)); 
     std::vector<std::vector<int>> enemy_ships_coordinates;
     std::vector<int> enemy_ships_lenghts;
     std::vector<Orientation> enemy_ships_orientations;
     for(size_t i=0;i<player_ship_number;i++)
     {
-        srand((unsigned)time(0)); 
         enemy_ships_lenghts.push_back(rand()%MAX_SHIP_LENGHT+1);
         enemy_ships_orientations.push_back(rand()%2 == 0 ? Orientation::horisontal : Orientation::vertical);
         enemy_ships_coordinates.push_back({rand()%width, rand()%height});

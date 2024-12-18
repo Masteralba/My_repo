@@ -5,13 +5,19 @@
 #include "myexception.hpp"
 
 
+bool is_digits(const std::string &str)
+{
+    return str.find_first_not_of("0123456789") == std::string::npos;
+}
+
 
 std::vector<int> Input::get_attack_coords()  // Функция для ввода координат атаки
 {
     std::cout << "Put attack coords: ";
     std::vector<int> coords;
     int x, y;
-    std::cin >> x >> y;
+    std::cin >> x;
+    std::cin >> y;
     if (x < 0 || y <0) throw ImproperCooordsInput(x, y);
     coords.push_back(x); coords.push_back(y);
     return coords;
@@ -19,11 +25,20 @@ std::vector<int> Input::get_attack_coords()  // Функция для ввода
 
 std::vector<int> Input::get_width_and_height() // Функция для воода широты и восоты поля
 {
-    std::cout << "Put width and height of the field: ";
+    std::cout << "Put width and height of the field in format _,_:";
     std::vector<int> field_parametrs;
+    std::string input_string;
     int width, height;
-    std::cin >> width >> height;
-    if (width <0 || height <0) throw ImproperWidthAndHeightInput(width, height);
+    std::cin >> input_string;
+    if (input_string.find(",") == std::string::npos) throw ImproperWidthAndHeightInput(input_string);
+    else
+    {
+        if (!is_digits(input_string.substr(0, input_string.find(',')))) throw ImproperWidthAndHeightInput(input_string);
+        if (!is_digits(input_string.substr(input_string.find(',')+1))) throw ImproperWidthAndHeightInput(input_string);
+        width = std::stoi(input_string.substr(0, input_string.find(',')));
+        height = std::stoi(input_string.substr(input_string.find(',')+1));
+    }
+    if (width <0 || height <0) throw ImproperWidthAndHeightInput(input_string);
     field_parametrs.push_back(width); field_parametrs.push_back(height);
     return field_parametrs;
 }
@@ -39,13 +54,13 @@ int Input::get_ships_number() // Функция для воода количес
 
 std::vector<int> Input::get_ships_lenghts(int ships_number) // Функция для вооад длин кораблей
 {
-    std::cout << "Put lenghts of the ships (max lenght = 4): ";
+    std::cout << "Put lenghts of the ships (max lenght = " << MAX_SHIP_LENGHT << "): ";
     std::vector<int> lenghts;
     for(size_t i=0; i<ships_number; i++)
     {
         int lenght;
         std::cin >> lenght;
-        if (lenght <= 0 || lenght >= MAX_SHIP_LENGHT) throw( ImproperLenghtsInput(lenght));
+        if (lenght <= 0 || lenght > MAX_SHIP_LENGHT) throw( ImproperLenghtsInput(lenght));
         lenghts.push_back(lenght);
     }
     return lenghts;
@@ -77,4 +92,12 @@ std::vector<std::vector<int>> Input::get_coordinates(int ships_number) // Фун
         coords.push_back({x, y});
     }
     return coords;
+}
+
+const char* Input::get_filename()
+{
+    std::cout << "Put filename: ";
+    char* string;
+    std::cin.getline(string, 100);
+    return string;
 }

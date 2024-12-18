@@ -1,7 +1,7 @@
 all: game
 
-game: main.o field.o ship.o shipmanager.o abilities.o abilitiesmanager.o myexception.o game.o gamestate.o fileprocessor.o gamemanager.o parser.o input.o
-	g++ -g main.o field.o ship.o shipmanager.o abilities.o abilitiesmanager.o myexception.o game.o gamestate.o fileprocessor.o gamemanager.o parser.o input.o -o game
+game: main.o field.o ship.o shipmanager.o abilities.o abilitiesmanager.o myexception.o game.o gamestate.o fileprocessor.o gamemanager.o parser.o input.o render.o display.o
+	g++ -g main.o field.o ship.o shipmanager.o abilities.o abilitiesmanager.o myexception.o game.o gamestate.o fileprocessor.o gamemanager.o parser.o input.o render.o display.o -o game
 
 main.o: main.cpp
 	g++ -c -g main.cpp -o main.o
@@ -41,6 +41,12 @@ parser.o: parser.cpp parser.hpp
 
 input.o: input.cpp input.hpp
 	g++ -c -g input.cpp -o input.o
+
+render.o: render.cpp render.hpp
+	g++ -c -g render.cpp -o render.o
+
+display.o: display.cpp display.hpp
+	g++ -c -g display.cpp -o display.o
 
 make clean:
 	rm *.o game

@@ -1,28 +1,24 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <map>
 #include "gamestate.hpp"
-
-enum class Commands
-{
-    ATTACK='a',
-    USE_ABILITY='u',
-    SAVE='s',
-    LOAD_FROM_FILE='l',
-    LOAD_FROM_INPUT='i',
-    HELP='h',
-    STOP = 'd'
-};
 
 class Parser
 {
     public:
 
-    Parser(){};
+    std::map<std::string, char> get_commands(){return this->commands;}
 
-    Commands get_command();
+    Parser();
+
+    char get_command();
 
     private:
 
+    std::map<std::string, char> commands;
+
     char command;
+
+    void set_cotrol();
 };

@@ -66,19 +66,19 @@ std::string ImproperCooordsInput::what()
 
 std::string ImproperCommandInput::what()
 {
-    std::string msg = "Cant find command: " + this->input + '\n';
+    std::string msg = "Cant find command: " + this->input + "\n";
     return msg;
 }
 
 std::string ImproperLenghtsInput::what()
 {
-    std::string msg = "Improper lenght: ?" + this->lenght + '\n';
+    std::string msg = "Improper lenght: " + std::to_string(this->lenght) + "\n";
     return msg;
 }
 
 std::string ImproperWidthAndHeightInput::what()
 {
-    std::string msg = "Improper width: " + std::to_string(this->width) + "and height: " + std::to_string(this->height) + '\n';
+    std::string msg = "Improper input: " + this->input_string;
     return msg;
 }
 

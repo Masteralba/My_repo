@@ -83,11 +83,10 @@ std::string GameState::get_data_for_output() const
 
 void GameState::get_data_from_input(std::string hash, std::string field_data, std::string player_data, std::string enemy_data)
 {
-    long int needed_hash = std::stol(hash);
 
-    long int hash_from_file = std::hash<std::string>{}(field_data + "\n" + player_data + "\n" + enemy_data);
+    std::string hash_from_file = std::to_string(std::hash<std::string>{}(field_data + "\n" + player_data + "\n" + enemy_data));
 
-    if (needed_hash != hash_from_file) throw FileWasChanged("");
+    if (hash.compare(hash_from_file)) throw FileWasChanged("");
 
 
     int width, height, player_ship_number, enemy_ship_number;

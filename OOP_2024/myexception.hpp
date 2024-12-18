@@ -88,13 +88,13 @@ class ImproperCommandInput
 {
     public:
 
-    ImproperCommandInput(char input):input(input){}
+    ImproperCommandInput(std::string input):input(input){}
 
     std::string what();
 
     private:
 
-    char input;
+    std::string input;
 };
 
 class ImproperCooordsInput
@@ -115,13 +115,13 @@ class ImproperWidthAndHeightInput
 {
     public:
 
-    ImproperWidthAndHeightInput(int width, int height):width(width), height(height){}
+    ImproperWidthAndHeightInput(std::string input_string):input_string(input_string){}
 
     std::string what();
 
     private:
 
-    int width, height;
+    std::string input_string;
 };
 
 

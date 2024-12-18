@@ -2,31 +2,36 @@
 #include "parser.hpp"
 #include "myexception.hpp"
 #include "input.hpp"
+#include "display.hpp"
+#include <iostream>
 
-GameManager::GameManager()
+template <typename T, typename G>
+GameManager<T, G>::GameManager()
 {
     this->game = new Game();
     this->parser = new Parser();
     this->input = new Input();
+    this->display = new Display<G>(this->game);
     this->game_started = false;
-
 }
 
-void GameManager::load_from_file()
+template <typename T, typename G>
+void GameManager<T, G>::load_from_file()
 {
-    //Ввод
-
     try{
             this->game->load_from_file();
             this->game_started = true;
     }
-    catch(std::runtime_error& e){std::cerr << e.what();}
-    catch(FileWasChanged& e){std::cerr << e.what();}
+    catch(std::runtime_error& e){std::cerr << e.what() << std::endl;}
+    catch(FileWasChanged& e){std::cerr << e.what() << std::endl << std::endl;}
+
+    this->display->display_player_field();
+    this->display->display_enemy_field();
 }
 
-void GameManager::load_from_input()
+template <typename T, typename G>
+void GameManager<T, G>::load_from_input()
 {
-    //Ввод и т.д
     try{
 
     std::vector<int> width_and_height = this->input->get_width_and_height();
@@ -41,67 +46,98 @@ void GameManager::load_from_input()
     player_ships_lenghts,
     player_ships_orientations,
     player_ships_coordinates);
+
+    this->game_started = true;
+
+    this->display->display_player_field();
+    this->display->display_enemy_field();
     }
-    catch (ImproperCooordsInput& e) {std::cerr << e.what();}
-    catch (ImproperLenghtsInput& e) {std::cerr << e.what();}
-    catch (ImproperOrieantationsInput& e) {std::cerr << e.what();}
-    catch (ImproperShipsNumberInput& e) {std::cerr << e.what();}
-    catch( ImproperWidthAndHeightInput& e) {std::cerr << e.what();}
+    catch (ImproperCooordsInput& e) {std::cerr << e.what() << std::endl;}
+    catch (ImproperLenghtsInput& e) {std::cerr << e.what() << std::endl;}
+    catch (ImproperOrieantationsInput& e) {std::cerr << e.what() << std::endl;}
+    catch (ImproperShipsNumberInput& e) {std::cerr << e.what() << std::endl;}
+    catch( ImproperWidthAndHeightInput& e) {std::cerr << e.what() << std::endl;}
 }
 
-void GameManager::save_to_file()
+template <typename T, typename G>
+void GameManager<T, G>::save_to_file()
 {
-    //Ввод имени файла
+    if (!this->game_started)
+    {
+        std::cout << "Game hasnt started yet\n";
+        return;
+    }
     this->game->save_to_file();
 }
 
-void GameManager::attack()
+
+template <typename T, typename G>
+void GameManager<T, G>::attack()
 {
+    if (!this->game_started)
+    {
+        std::cout << "Game hasnt started yet\n";
+        return;
+    }
     try
     {
         std::vector<int> coords = this->input->get_attack_coords();
         this->game->player_attack(coords[0], coords[1]);
+
+        this->display->display_player_field();
+        this->display->display_enemy_field();
     }
-    catch ( ImproperCooordsInput& e ) {std::cerr << e.what();}
+    catch ( ImproperCooordsInput& e ) {std::cerr << e.what() << std::endl;}
 }
 
-void GameManager::use_ability()
+template <typename T, typename G>
+void GameManager<T, G>::use_ability()
 {
-    if (this->game_started) this->game->use_ability();
+    if (!this->game_started)
+    {
+        std::cout << "Game hasnt started yet\n";
+        return;
+    }
+    this->game->use_ability();
+
+    this->display->display_player_field();
+    this->display->display_enemy_field();
 }
 
-void GameManager::use_command()
+template <typename T, typename G>
+void GameManager<T, G>::use_command()
 {
     try{
-        Commands command = this->parser->get_command();
-        switch (command)
-        {
-        case Commands::ATTACK :
-        {
-            this->attack();
-            break; 
-        }
-        case Commands::LOAD_FROM_FILE:
-        {
-            this->load_from_file();
-            break;
-        }
+        
+    char command = this->parser->get_command();
 
-        case Commands::LOAD_FROM_INPUT:
-        {
-            this->load_from_input();
-            break;
-        }
+    if (command == this->parser->get_commands().at(std::string("ATTACK")))
+    {
+        this->attack();
+        return;
+    }
+    if (command == this->parser->get_commands().at(std::string("LOAD_FROM_FILE")))
+    {
+        this->load_from_file();
+        return;
+    }
+    if (command == this->parser->get_commands().at(std::string("SAVE")))
+    {
+        this->save_to_file();
+        return;
+    }
+    if (command == this->parser->get_commands().at(std::string("LOAD_FROM_INPUT")))
+    {
+        this->load_from_input();
+        return;
+    }
+    if (command == this->parser->get_commands().at(std::string("USE_ABILITY")))
+    {
+        this->use_ability();
+        return;
+    }
+    if (command == this->parser->get_commands().at(std::string("STOP"))) {}
 
-        case Commands::USE_ABILITY:
-        {
-            this->use_ability();
-            break;
-        }
-
-        default:
-            break;
-        }
 
     } catch (ImproperCommandInput& e) {std::cerr << e.what();}
 }

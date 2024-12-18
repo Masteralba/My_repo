@@ -1,11 +1,15 @@
 #include <iostream>
 #include "gamemanager.hpp"
+#include "display.cpp"
+#include "gamemanager.cpp"
+#include "display.hpp"
+#include "parser.hpp"
+#include "render.hpp"
 
 int main()
 {
-    GameManager* gamemanager = new GameManager();
-    // загрузка из ввода или из файла
-    while(1)
+    GameManager<Parser, Render>* gamemanager = new GameManager<Parser, Render>();
+    while(true)
     {
         gamemanager->use_command();
     }
