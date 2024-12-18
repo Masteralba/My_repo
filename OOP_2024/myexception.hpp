@@ -83,3 +83,85 @@ class FileWasChanged
     std::string filename = "";
 };
 
+
+class ImproperCommandInput
+{
+    public:
+
+    ImproperCommandInput(std::string input):input(input){}
+
+    std::string what();
+
+    private:
+
+    std::string input;
+};
+
+class ImproperCooordsInput
+{
+    public:
+
+    ImproperCooordsInput(int x, int y):x(x), y(y){}
+
+    std::string what();
+
+    private:
+
+    int x, y;
+};
+
+
+class ImproperWidthAndHeightInput
+{
+    public:
+
+    ImproperWidthAndHeightInput(std::string input_string):input_string(input_string){}
+
+    std::string what();
+
+    private:
+
+    std::string input_string;
+};
+
+
+class ImproperLenghtsInput
+{
+    public:
+
+    ImproperLenghtsInput(int lenght):lenght(lenght){}
+
+    std::string what();
+
+    private:
+
+    int lenght;
+};
+
+
+class ImproperShipsNumberInput
+{
+    public:
+
+    ImproperShipsNumberInput(int num):num(num){}
+
+    std::string what();
+
+    private:
+
+    int num;
+};
+
+
+class ImproperOrieantationsInput
+{
+    public:
+
+    ImproperOrieantationsInput(char input):input(input){}
+
+    std::string what();
+
+    private:
+
+    char input;
+};
